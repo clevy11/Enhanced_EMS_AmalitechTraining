@@ -14,11 +14,10 @@ public class HelloController {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("employee-view.fxml"));
             Parent root = loader.load();
-            Stage stage = (Stage) root.getScene().getWindow();
-            Scene scene = new Scene(root);
-            scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
-            stage.setScene(scene);
-            stage.setFullScreen(true);
+            Stage stage = new Stage();
+            stage.setTitle("Employee Management");
+            stage.setScene(new Scene(root));
+            stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }

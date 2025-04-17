@@ -7,12 +7,13 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class HelloApplication extends Application {
+public class EmployeeManagementApp extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("hello-vie.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 800, 500);
-        stage.setTitle("Hello!");
+        FXMLLoader fxmlLoader = new FXMLLoader(EmployeeManagementApp.class.getResource("hello-view.fxml"));
+        Scene scene = new Scene(fxmlLoader.load(), 800, 600);
+        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
+        stage.setTitle("Employee Management System");
         stage.setScene(scene);
         stage.show();
     }
@@ -20,4 +21,4 @@ public class HelloApplication extends Application {
     public static void main(String[] args) {
         launch();
     }
-}
+} 

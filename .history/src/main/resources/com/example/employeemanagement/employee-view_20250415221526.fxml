@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.employeemanagement.EmployeeController" spacing="10">
+    <padding>
+        <Insets top="10" right="10" bottom="10" left="10"/>
+    </padding>
+
+    <!-- Employee Form -->
+    <HBox spacing="10">
+        <VBox spacing="5">
+            <Label text="Employee ID:"/>
+            <TextField fx:id="employeeIdField"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Name:"/>
+            <TextField fx:id="nameField"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Department:"/>
+            <TextField fx:id="departmentField"/>
+        </VBox>
+    </HBox>
+
+    <HBox spacing="10">
+        <VBox spacing="5">
+            <Label text="Salary:"/>
+            <TextField fx:id="salaryField"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Performance Rating:"/>
+            <TextField fx:id="ratingField"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Years of Experience:"/>
+            <TextField fx:id="experienceField"/>
+        </VBox>
+    </HBox>
+
+    <!-- Action Buttons -->
+    <HBox spacing="10">
+        <Button text="Add Employee" onAction="#handleAddEmployee"/>
+        <Button text="Remove Employee" onAction="#handleRemoveEmployee"/>
+        <Button text="Update Employee" onAction="#handleUpdateEmployee"/>
+    </HBox>
+
+    <!-- Search and Filter -->
+    <HBox spacing="10">
+        <VBox spacing="5">
+            <Label text="Search by Name:"/>
+            <TextField fx:id="searchField"/>
+        </VBox>
+        <VBox spacing="5">
+            <Label text="Filter by Department:"/>
+            <TextField fx:id="departmentFilterField"/>
+        </VBox>
+        <Button text="Search" onAction="#handleSearch"/>
+    </HBox>
+
+    <!-- Sorting Options -->
+    <HBox spacing="10">
+        <Button text="Sort by Experience" onAction="#handleSortByExperience"/>
+        <Button text="Sort by Salary" onAction="#handleSortBySalary"/>
+        <Button text="Sort by Performance" onAction="#handleSortByPerformance"/>
+    </HBox>
+
+    <!-- Employee List -->
+    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID"/>
+            <TableColumn fx:id="nameColumn" text="Name"/>
+            <TableColumn fx:id="departmentColumn" text="Department"/>
+            <TableColumn fx:id="salaryColumn" text="Salary"/>
+            <TableColumn fx:id="ratingColumn" text="Rating"/>
+            <TableColumn fx:id="experienceColumn" text="Experience"/>
+        </columns>
+    </TableView>
+</VBox> 

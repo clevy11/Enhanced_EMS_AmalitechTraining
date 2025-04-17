@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<StackPane xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.employeemanagement.HelloController" styleClass="home-container">
+    <!-- Header with Login/Register buttons -->
+    <HBox styleClass="header-buttons" StackPane.alignment="TOP_RIGHT">
+        <Button styleClass="login-button" text="LOGIN" />
+        <Button styleClass="register-button" text="REGISTER" />
+    </HBox>
+    
+    <VBox alignment="CENTER" spacing="20.0" maxWidth="Infinity" maxHeight="Infinity">
+        <ImageView fitHeight="300.0" fitWidth="800.0" preserveRatio="true">
+            <Image url="@../../../images/EMS.png" />
+        </ImageView>
+        
+        <VBox alignment="CENTER" spacing="15.0" styleClass="content-box">
+            <padding>
+                <Insets bottom="30.0" left="40.0" right="40.0" top="30.0" />
+            </padding>
+            
+            <Label styleClass="welcome-text" text="Employee Management">
+                <font>
+                    <Font name="System Bold" size="28.0" />
+                </font>
+            </Label>
+            
+            <Label styleClass="subtitle-text" text="Manage your employees efficiently">
+                <font>
+                    <Font name="System" size="18.0" />
+                </font>
+            </Label>
+            
+            <Button onAction="#goToEmployeeManagement" styleClass="nav-button" text="Get Started">
+                <font>
+                    <Font name="System Bold" size="16.0" />
+                </font>
+                <padding>
+                    <Insets bottom="12.0" left="30.0" right="30.0" top="12.0" />
+                </padding>
+            </Button>
+        </VBox>
+    </VBox>
+</StackPane>
