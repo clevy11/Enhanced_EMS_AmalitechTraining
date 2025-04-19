@@ -359,59 +359,6 @@ public class EmployeeController {
         employeeList.setAll(employeeDatabase.sortByPerformance());
     }
 
-    @FXML
-    private void handleRaiseSalary() {
-        if (employeeIdField.getText().isEmpty()) {
-            showAlert("Error", "Please enter an employee ID to apply raise");
-            return;
-        }
-
-        try {
-            Integer id = Integer.parseInt(employeeIdField.getText());
-            Employee<Integer> employee = employeeDatabase.getEmployee(id);
-            
-            if (employee == null) {
-                showAlert("Error", "No employee found with this ID");
-                return;
-            }
-
-            // Calculate raise based on performance rating
-            double currentRating = employee.getPerformanceRating();
-            double raisePercentage = calculateRaisePercentage(currentRating);
-            double currentSalary = employee.getSalary();
-            double newSalary = currentSalary * (1 + raisePercentage/100);
-
-            // Update the employee's salary
-            employeeDatabase.updateEmployeeDetails(id, "salary", newSalary);
-            refreshEmployeeList();
-            
-            // Show success message
-            showSuccessAlert("Salary Raise Applied", 
-                String.format("Employee %s received a %.1f%% raise.\nNew salary: $%.2f", 
-                    employee.getName(), raisePercentage, newSalary));
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid employee ID.");
-        }
-    }
-
-    private double calculateRaisePercentage(double rating) {
-        // Performance-based raise calculation
-        if (rating >= 4.5) return 10.0;  // Outstanding
-        if (rating >= 4.0) return 8.0;   // Excellent
-        if (rating >= 3.5) return 6.0;   // Very Good
-        if (rating >= 3.0) return 4.0;   // Good
-        if (rating >= 2.0) return 2.0;   // Satisfactory
-        return 0.0;                      // Needs Improvement
-    }
-
-    private void showSuccessAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void refreshEmployeeList() {
         employeeList.setAll(employeeDatabase.getAllEmployees());
     }

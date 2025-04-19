@@ -92,26 +92,25 @@
             </GridPane>
 
             <!-- Action Buttons -->
-            <HBox alignment="CENTER" styleClass="button-container">
-                <Button onAction="#handleAddEmployee" styleClass="action-button" text="Save">
-                    <HBox.margin>
-                        <Insets right="10" />
-                    </HBox.margin>
-                </Button>
-                <Button onAction="#handleUpdateEmployee" styleClass="action-button" text="Update">
-                    <HBox.margin>
-                        <Insets right="4.0" />
-                    </HBox.margin>
-                </Button>
-                <Button onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove">
-                    <HBox.margin>
-                        <Insets right="10" />
-                    </HBox.margin>
-                </Button>
-                <Button onAction="#handleRaiseSalary" styleClass="raise-button" text="Raise Salary" />
-            <padding>
-               <Insets left="-330.0" top="-1.0" />
-            </padding>
+            <HBox styleClass="button-container">
+                <Button onAction="#handleAddEmployee" styleClass="action-button" text="Add ">
+               <HBox.margin>
+                  <Insets top="20.0" />
+               </HBox.margin></Button>
+                <Button onAction="#handleUpdateEmployee" prefHeight="25.0" prefWidth="101.0" styleClass="action-button" text="Update ">
+               <HBox.margin>
+                  <Insets left="45.0" top="20.0" />
+               </HBox.margin></Button>
+                <Button layoutX="-12.0" onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove">
+               <HBox.margin>
+                  <Insets left="49.0" top="20.0" />
+               </HBox.margin></Button>
+                <HBox.margin>
+                    <Insets left="7.0" right="3.0" top="30.0" />
+                </HBox.margin>
+                <padding>
+                    <Insets left="17.0" right="8.0" />
+                </padding>
             </HBox>
         </VBox>
 
@@ -119,7 +118,7 @@
         <VBox styleClass="search-container" HBox.hgrow="ALWAYS">
             <HBox styleClass="search-box">
                 <TextField fx:id="searchField" promptText="Search by name..." styleClass="search-field" />
-                <ComboBox fx:id="departmentFilterField" prefWidth="200.0" promptText="Filter by department..." styleClass="search-field" />
+                <ComboBox fx:id="departmentFilterField" promptText="Filter by department..." prefWidth="200.0" styleClass="search-field" />
                 <Button onAction="#handleSearch" styleClass="search-button" text="Search" />
             </HBox>
 

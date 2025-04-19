@@ -80,11 +80,11 @@
 
 /* Button Container */
 .button-container {
-    -fx-spacing: 5px;
-    -fx-padding: 5px;
-    -fx-alignment: left-center;
+    -fx-spacing: 20px;
+    -fx-padding: 20px;
+    -fx-alignment: center;
     -fx-background-color: #f8f9fa;
-    -fx-background-radius: 5px;
+    -fx-background-radius: 10px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);
 }
 

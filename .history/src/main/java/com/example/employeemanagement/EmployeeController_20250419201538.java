@@ -11,8 +11,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 public class EmployeeController {
     private final EmployeeDatabase<Integer> employeeDatabase = new EmployeeDatabase<>();
@@ -20,12 +18,12 @@ public class EmployeeController {
 
     @FXML private TextField employeeIdField;
     @FXML private TextField nameField;
-    @FXML private ComboBox<String> departmentField;
+    @FXML private TextField departmentField;
     @FXML private TextField salaryField;
-    @FXML private ComboBox<Integer> ratingField;
+    @FXML private TextField ratingField;
     @FXML private TextField experienceField;
     @FXML private TextField searchField;
-    @FXML private ComboBox<String> departmentFilterField;
+    @FXML private TextField departmentFilterField;
     @FXML private TableView<Employee<Integer>> employeeTable;
     @FXML private TableColumn<Employee<Integer>, Integer> idColumn;
     @FXML private TableColumn<Employee<Integer>, String> nameColumn;
@@ -42,31 +40,11 @@ public class EmployeeController {
     @FXML private Label ratingErrorLabel;
     @FXML private Label experienceErrorLabel;
 
-    // List of departments
-    private final List<String> departments = Arrays.asList(
-        "HR", "IT", "Finance", "Marketing", "Operations", 
-        "Sales", "Customer Service", "Research & Development", "Legal", "Administration"
-    );
-    
     @FXML
     public void initialize() {
         setupTableColumns();
-        setupComboBoxes();
         setupValidation();
         refreshEmployeeList();
-    }
-    
-    private void setupComboBoxes() {
-        // Setup department ComboBox
-        departmentField.setItems(FXCollections.observableArrayList(departments));
-        
-        // Setup rating ComboBox (1-5)
-        ratingField.setItems(FXCollections.observableArrayList(1, 2, 3, 4, 5));
-        
-        // Setup department filter ComboBox
-        departmentFilterField.setItems(FXCollections.observableArrayList(departments));
-        departmentFilterField.getItems().add(0, "All Departments");
-        departmentFilterField.setValue("All Departments");
     }
 
     private void setupTableColumns() {
@@ -102,9 +80,9 @@ public class EmployeeController {
         // Add listeners to validate input fields
         employeeIdField.textProperty().addListener((obs, oldVal, newVal) -> validateId(newVal));
         nameField.textProperty().addListener((obs, oldVal, newVal) -> validateName(newVal));
-        departmentField.valueProperty().addListener((obs, oldVal, newVal) -> validateDepartment(newVal));
+        departmentField.textProperty().addListener((obs, oldVal, newVal) -> validateDepartment(newVal));
         salaryField.textProperty().addListener((obs, oldVal, newVal) -> validateSalary(newVal));
-        ratingField.valueProperty().addListener((obs, oldVal, newVal) -> validateRating(newVal != null ? newVal.toString() : ""));
+        ratingField.textProperty().addListener((obs, oldVal, newVal) -> validateRating(newVal));
         experienceField.textProperty().addListener((obs, oldVal, newVal) -> validateExperience(newVal));
     }
 
@@ -208,9 +186,9 @@ public class EmployeeController {
         // Validate all fields first
         validateId(employeeIdField.getText());
         validateName(nameField.getText());
-        validateDepartment(departmentField.getValue());
+        validateDepartment(departmentField.getText());
         validateSalary(salaryField.getText());
-        validateRating(ratingField.getValue() != null ? ratingField.getValue().toString() : "");
+        validateRating(ratingField.getText());
         validateExperience(experienceField.getText());
         
         if (!isFormValid()) {
@@ -228,9 +206,9 @@ public class EmployeeController {
             }
             
             String name = nameField.getText();
-            String department = departmentField.getValue();
+            String department = departmentField.getText();
             double salary = Double.parseDouble(salaryField.getText());
-            double rating = ratingField.getValue() != null ? ratingField.getValue() : 0;
+            double rating = Double.parseDouble(ratingField.getText());
             int experience = Integer.parseInt(experienceField.getText());
 
             Employee<Integer> employee = new Employee<>(id, name, department, salary, rating, experience);
@@ -284,9 +262,9 @@ public class EmployeeController {
                 
                 switch (field) {
                     case "name" -> validateName(nameField.getText());
-                    case "department" -> validateDepartment(departmentField.getValue());
+                    case "department" -> validateDepartment(departmentField.getText());
                     case "salary" -> validateSalary(salaryField.getText());
-                    case "performancerating" -> validateRating(ratingField.getValue() != null ? ratingField.getValue().toString() : "");
+                    case "performancerating" -> validateRating(ratingField.getText());
                     case "yearsofexperience" -> validateExperience(experienceField.getText());
                 }
                 
@@ -328,16 +306,16 @@ public class EmployeeController {
     @FXML
     private void handleSearch() {
         String searchTerm = searchField.getText();
-        String department = departmentFilterField.getValue();
+        String department = departmentFilterField.getText();
 
-        if (!searchTerm.isEmpty() && department != null && !department.equals("All Departments")) {
+        if (!searchTerm.isEmpty() && !department.isEmpty()) {
             employeeList.setAll(employeeDatabase.searchEmployeesByName(searchTerm)
                     .stream()
                     .filter(e -> e.getDepartment().equalsIgnoreCase(department))
                     .toList());
         } else if (!searchTerm.isEmpty()) {
             employeeList.setAll(employeeDatabase.searchEmployeesByName(searchTerm));
-        } else if (department != null && !department.equals("All Departments")) {
+        } else if (!department.isEmpty()) {
             employeeList.setAll(employeeDatabase.getEmployeesByDepartment(department));
         } else {
             refreshEmployeeList();
@@ -359,59 +337,6 @@ public class EmployeeController {
         employeeList.setAll(employeeDatabase.sortByPerformance());
     }
 
-    @FXML
-    private void handleRaiseSalary() {
-        if (employeeIdField.getText().isEmpty()) {
-            showAlert("Error", "Please enter an employee ID to apply raise");
-            return;
-        }
-
-        try {
-            Integer id = Integer.parseInt(employeeIdField.getText());
-            Employee<Integer> employee = employeeDatabase.getEmployee(id);
-            
-            if (employee == null) {
-                showAlert("Error", "No employee found with this ID");
-                return;
-            }
-
-            // Calculate raise based on performance rating
-            double currentRating = employee.getPerformanceRating();
-            double raisePercentage = calculateRaisePercentage(currentRating);
-            double currentSalary = employee.getSalary();
-            double newSalary = currentSalary * (1 + raisePercentage/100);
-
-            // Update the employee's salary
-            employeeDatabase.updateEmployeeDetails(id, "salary", newSalary);
-            refreshEmployeeList();
-            
-            // Show success message
-            showSuccessAlert("Salary Raise Applied", 
-                String.format("Employee %s received a %.1f%% raise.\nNew salary: $%.2f", 
-                    employee.getName(), raisePercentage, newSalary));
-        } catch (NumberFormatException e) {
-            showAlert("Invalid Input", "Please enter a valid employee ID.");
-        }
-    }
-
-    private double calculateRaisePercentage(double rating) {
-        // Performance-based raise calculation
-        if (rating >= 4.5) return 10.0;  // Outstanding
-        if (rating >= 4.0) return 8.0;   // Excellent
-        if (rating >= 3.5) return 6.0;   // Very Good
-        if (rating >= 3.0) return 4.0;   // Good
-        if (rating >= 2.0) return 2.0;   // Satisfactory
-        return 0.0;                      // Needs Improvement
-    }
-
-    private void showSuccessAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
-    }
-
     private void refreshEmployeeList() {
         employeeList.setAll(employeeDatabase.getAllEmployees());
     }
@@ -419,9 +344,9 @@ public class EmployeeController {
     private void clearFields() {
         employeeIdField.clear();
         nameField.clear();
-        departmentField.setValue(null);
+        departmentField.clear();
         salaryField.clear();
-        ratingField.setValue(null);
+        ratingField.clear();
         experienceField.clear();
     }
     
@@ -436,9 +361,9 @@ public class EmployeeController {
 
     private String getSelectedField() {
         if (!nameField.getText().isEmpty()) return "name";
-        if (departmentField.getValue() != null) return "department";
+        if (!departmentField.getText().isEmpty()) return "department";
         if (!salaryField.getText().isEmpty()) return "salary";
-        if (ratingField.getValue() != null) return "performancerating";
+        if (!ratingField.getText().isEmpty()) return "performancerating";
         if (!experienceField.getText().isEmpty()) return "yearsofexperience";
         return null;
     }
@@ -447,9 +372,9 @@ public class EmployeeController {
         if (field == null) return null;
         return switch (field) {
             case "name" -> nameField.getText();
-            case "department" -> departmentField.getValue();
+            case "department" -> departmentField.getText();
             case "salary" -> Double.parseDouble(salaryField.getText());
-            case "performancerating" -> ratingField.getValue();
+            case "performancerating" -> Double.parseDouble(ratingField.getText());
             case "yearsofexperience" -> Integer.parseInt(experienceField.getText());
             default -> null;
         };

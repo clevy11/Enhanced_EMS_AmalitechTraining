@@ -92,26 +92,23 @@
             </GridPane>
 
             <!-- Action Buttons -->
-            <HBox alignment="CENTER" styleClass="button-container">
-                <Button onAction="#handleAddEmployee" styleClass="action-button" text="Save">
+            <HBox styleClass="button-container" alignment="CENTER">
+                <Button onAction="#handleAddEmployee" styleClass="action-button" text="Add Employee">
                     <HBox.margin>
                         <Insets right="10" />
                     </HBox.margin>
                 </Button>
-                <Button onAction="#handleUpdateEmployee" styleClass="action-button" text="Update">
+                <Button onAction="#handleUpdateEmployee" styleClass="action-button" text="Update Employee">
                     <HBox.margin>
-                        <Insets right="4.0" />
+                        <Insets right="10" />
                     </HBox.margin>
                 </Button>
-                <Button onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove">
+                <Button onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove Employee">
                     <HBox.margin>
                         <Insets right="10" />
                     </HBox.margin>
                 </Button>
                 <Button onAction="#handleRaiseSalary" styleClass="raise-button" text="Raise Salary" />
-            <padding>
-               <Insets left="-330.0" top="-1.0" />
-            </padding>
             </HBox>
         </VBox>
 
@@ -119,7 +116,7 @@
         <VBox styleClass="search-container" HBox.hgrow="ALWAYS">
             <HBox styleClass="search-box">
                 <TextField fx:id="searchField" promptText="Search by name..." styleClass="search-field" />
-                <ComboBox fx:id="departmentFilterField" prefWidth="200.0" promptText="Filter by department..." styleClass="search-field" />
+                <ComboBox fx:id="departmentFilterField" promptText="Filter by department..." prefWidth="200.0" styleClass="search-field" />
                 <Button onAction="#handleSearch" styleClass="search-button" text="Search" />
             </HBox>
 
