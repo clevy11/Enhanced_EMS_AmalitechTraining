@@ -140,7 +140,7 @@ public class EmployeeController {
     }
 
     private void validateDepartment(String value) {
-        if (value == null || value.isEmpty()) {
+        if (value.isEmpty()) {
             departmentErrorLabel.setText("Department is required");
         } else {
             departmentErrorLabel.setText("");
@@ -165,7 +165,7 @@ public class EmployeeController {
     }
 
     private void validateRating(String value) {
-        if (value == null || value.isEmpty()) {
+        if (value.isEmpty()) {
             ratingErrorLabel.setText("Rating is required");
         } else {
             try {
@@ -239,16 +239,9 @@ public class EmployeeController {
 
             Employee<Integer> employee = new Employee<>(id, name, department, salary, rating, experience);
             employeeDatabase.addEmployee(employee);
-            
-            // Console output for added employee
-            System.out.println("\n=== Employee Added ===");
-            System.out.printf("ID: %d\nName: %s\nDepartment: %s\nSalary: $%.2f\nRating: %.1f\nExperience: %d years\n",
-                id, name, department, salary, rating, experience);
-            System.out.println("=====================\n");
-            
             refreshEmployeeList();
             clearFields();
-            clearErrorLabels();
+            clearErrorLabels(); // Clear all error messages after successful addition
         } catch (NumberFormatException e) {
             showAlert("Invalid Input", "Please enter valid numbers for ID, salary, rating, and experience.");
         }
@@ -358,28 +351,16 @@ public class EmployeeController {
     @FXML
     private void handleSortByExperience() {
         employeeList.setAll(employeeDatabase.sortByExperience());
-        System.out.println("\n=== Employees Sorted by Experience ===");
-        employeeList.forEach(emp -> System.out.printf("ID: %d, Name: %s, Experience: %d years\n",
-            emp.getEmployeeId(), emp.getName(), emp.getYearsOfExperience()));
-        System.out.println("====================================\n");
     }
 
     @FXML
     private void handleSortBySalary() {
         employeeList.setAll(employeeDatabase.sortBySalary());
-        System.out.println("\n=== Employees Sorted by Salary ===");
-        employeeList.forEach(emp -> System.out.printf("ID: %d, Name: %s, Salary: $%.2f\n",
-            emp.getEmployeeId(), emp.getName(), emp.getSalary()));
-        System.out.println("=================================\n");
     }
 
     @FXML
     private void handleSortByPerformance() {
         employeeList.setAll(employeeDatabase.sortByPerformance());
-        System.out.println("\n=== Employees Sorted by Performance ===");
-        employeeList.forEach(emp -> System.out.printf("ID: %d, Name: %s, Rating: %.1f\n",
-            emp.getEmployeeId(), emp.getName(), emp.getPerformanceRating()));
-        System.out.println("======================================\n");
     }
 
     @FXML
@@ -407,12 +388,6 @@ public class EmployeeController {
             // Update the employee's salary
             employeeDatabase.updateEmployeeDetails(id, "salary", newSalary);
             refreshEmployeeList();
-            
-            // Console output for salary raise
-            System.out.println("\n=== Salary Raise Applied ===");
-            System.out.printf("Employee: %s\nPrevious Salary: $%.2f\nRaise Percentage: %.1f%%\nNew Salary: $%.2f\n",
-                employee.getName(), currentSalary, raisePercentage, newSalary);
-            System.out.println("===========================\n");
             
             // Show success message
             showSuccessAlert("Salary Raise Applied", 
@@ -452,7 +427,6 @@ public class EmployeeController {
         salaryField.clear();
         ratingField.setValue(null);
         experienceField.clear();
-        departmentAnalyticsField.setValue(null);
     }
     
     private void clearErrorLabels() {
@@ -505,11 +479,6 @@ public class EmployeeController {
                 i + 1, emp.getName(), emp.getDepartment(), emp.getSalary()));
         }
         
-        // Console output for top paid employees
-        System.out.println("\n=== Top 5 Paid Employees ===");
-        System.out.println(output.toString());
-        System.out.println("===========================\n");
-        
         analyticsOutput.setText(output.toString());
     }
 
@@ -525,12 +494,8 @@ public class EmployeeController {
         }
         
         if (employees.isEmpty()) {
-            String message = "No employees found" + 
-                (selectedDept != null ? " in department: " + selectedDept : "");
-            System.out.println("\n=== Average Salary ===");
-            System.out.println(message);
-            System.out.println("=====================\n");
-            analyticsOutput.setText(message);
+            analyticsOutput.setText("No employees found" + 
+                (selectedDept != null ? " in department: " + selectedDept : ""));
             return;
         }
         
@@ -542,11 +507,6 @@ public class EmployeeController {
         String output = String.format("Average Salary%s: $%.2f",
             selectedDept != null ? " in " + selectedDept : "",
             average);
-        
-        // Console output for average salary
-        System.out.println("\n=== Average Salary ===");
-        System.out.println(output);
-        System.out.println("=====================\n");
         
         analyticsOutput.setText(output);
     }
