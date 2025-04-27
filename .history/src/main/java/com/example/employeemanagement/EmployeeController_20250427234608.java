@@ -1,6 +1,7 @@
 package com.example.employeemanagement;
 
-import com.example.employeemanagement.Exception.*;
+import com.example.employeemanagement.Exception.InvalidDepartmentException;
+import com.example.employeemanagement.Exception.InvalidSalaryException;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,21 +10,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 public class EmployeeController {
+    private static final Logger logger = Logger.getLogger(EmployeeController.class.getName());
     private final EmployeeDatabase<Integer> employeeDatabase = new EmployeeDatabase<>();
     private final ObservableList<Employee<Integer>> employeeList = FXCollections.observableArrayList();
-    private static final Logger logger = Logger.getLogger(EmployeeController.class.getName());
 
-    @FXML private TextField employeeIdField;
     @FXML private TextField nameField;
     @FXML private ComboBox<String> departmentField;
     @FXML private TextField salaryField;
@@ -40,7 +40,6 @@ public class EmployeeController {
     @FXML private TableColumn<Employee<Integer>, Integer> experienceColumn;
     
     // Error labels
-    @FXML private Label idErrorLabel;
     @FXML private Label nameErrorLabel;
     @FXML private Label departmentErrorLabel;
     @FXML private Label salaryErrorLabel;
@@ -56,22 +55,62 @@ public class EmployeeController {
     @FXML private ComboBox<String> departmentAnalyticsField;
     @FXML private TextArea analyticsOutput;
 
+    // Buttons
+    @FXML private Button saveButton;
+    @FXML private Button updateButton;
+    @FXML private Button deleteButton;
+    @FXML private Button raiseSalaryButton;
+
     @FXML
     public void initialize() {
         setupTableColumns();
         setupComboBoxes();
         setupValidation();
+        setupButtonVisibility();
+        setupTableSelectionListener();
         refreshEmployeeList();
     }
     
+    private void setupButtonVisibility() {
+        // Initially only show save button
+        saveButton.setVisible(true);
+        updateButton.setVisible(false);
+        deleteButton.setVisible(false);
+        raiseSalaryButton.setVisible(false);
+    }
+
+    private void setupTableSelectionListener() {
+        employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                showEmployeePopup(newSelection);
+            }
+        });
+    }
+
+    private void showEmployeePopup(Employee<Integer> employee) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/example/employeemanagement/employee-details.fxml"));
+            Parent root = loader.load();
+            
+            EmployeeDetailsController detailsController = loader.getController();
+            detailsController.setEmployee(employee);
+            
+            Stage stage = new Stage();
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setTitle("Employee Details");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+            
+            refreshEmployeeList();
+        } catch (IOException e) {
+            logger.severe("Error loading employee details popup: " + e.getMessage());
+            showAlert("Error", "Failed to load employee details");
+        }
+    }
+
     private void setupComboBoxes() {
-        // Setup department ComboBox
         departmentField.setItems(FXCollections.observableArrayList(departments));
-        
-        // Setup rating ComboBox (1-5)
         ratingField.setItems(FXCollections.observableArrayList(1, 2, 3, 4, 5));
-        
-        // Setup department filter ComboBox
         departmentFilterField.setItems(FXCollections.observableArrayList(departments));
         departmentFilterField.getItems().add(0, "All Departments");
         departmentFilterField.setValue("All Departments");
@@ -102,35 +141,15 @@ public class EmployeeController {
             }
         });
         experienceColumn.setCellValueFactory(new PropertyValueFactory<>("yearsOfExperience"));
-
         employeeTable.setItems(employeeList);
     }
 
     private void setupValidation() {
-        // Add listeners to validate input fields
-        employeeIdField.textProperty().addListener((obs, oldVal, newVal) -> validateId(newVal));
         nameField.textProperty().addListener((obs, oldVal, newVal) -> validateName(newVal));
         departmentField.valueProperty().addListener((obs, oldVal, newVal) -> validateDepartment(newVal));
         salaryField.textProperty().addListener((obs, oldVal, newVal) -> validateSalary(newVal));
         ratingField.valueProperty().addListener((obs, oldVal, newVal) -> validateRating(newVal != null ? newVal.toString() : ""));
         experienceField.textProperty().addListener((obs, oldVal, newVal) -> validateExperience(newVal));
-    }
-
-    private void validateId(String value) {
-        if (value.isEmpty()) {
-            idErrorLabel.setText("Employee ID is required");
-        } else {
-            try {
-                Integer id = Integer.parseInt(value);
-                if (id <= 0) {
-                    idErrorLabel.setText("ID must be a positive number");
-                } else {
-                    idErrorLabel.setText("");
-                }
-            } catch (NumberFormatException e) {
-                idErrorLabel.setText("ID must be a valid number");
-            }
-        }
     }
 
     private void validateName(String value) {
@@ -203,8 +222,7 @@ public class EmployeeController {
     }
 
     private boolean isFormValid() {
-        return idErrorLabel.getText().isEmpty() &&
-               nameErrorLabel.getText().isEmpty() &&
+        return nameErrorLabel.getText().isEmpty() &&
                departmentErrorLabel.getText().isEmpty() &&
                salaryErrorLabel.getText().isEmpty() &&
                ratingErrorLabel.getText().isEmpty() &&
@@ -214,8 +232,6 @@ public class EmployeeController {
     @FXML
     private void handleAddEmployee() {
         try {
-            // Validate all fields first
-            validateId(employeeIdField.getText());
             validateName(nameField.getText());
             validateDepartment(departmentField.getValue());
             validateSalary(salaryField.getText());
@@ -227,105 +243,98 @@ public class EmployeeController {
                 return;
             }
 
-            Integer id = Integer.parseInt(employeeIdField.getText());
             String name = nameField.getText();
             String department = departmentField.getValue();
             double salary = Double.parseDouble(salaryField.getText());
             double rating = ratingField.getValue() != null ? ratingField.getValue() : 0;
             int experience = Integer.parseInt(experienceField.getText());
 
-            Employee<Integer> employee = new Employee<>(id, name, department, salary, rating, experience);
+            Employee<Integer> employee = new Employee<>(name, department, salary, rating, experience);
             employeeDatabase.addEmployee(employee);
             
-            logger.log(Level.INFO, "Employee added successfully: " + employee);
+            logger.info("Added new employee: " + employee);
             
             refreshEmployeeList();
             clearFields();
             showSuccessAlert("Success", "Employee added successfully");
             
-        } catch (NumberFormatException e) {
-            showAlert("Input Error", "Please enter valid numbers for ID, salary, and experience");
-            logger.log(Level.WARNING, "Invalid number format: " + e.getMessage());
         } catch (InvalidSalaryException e) {
-            salaryErrorLabel.setText(e.getMessage());
-            logger.log(Level.WARNING, "Invalid salary: " + e.getMessage());
+            logger.warning("Invalid salary: " + e.getMessage());
+            showAlert("Error", e.getMessage());
         } catch (InvalidDepartmentException e) {
-            departmentErrorLabel.setText(e.getMessage());
-            logger.log(Level.WARNING, "Invalid department: " + e.getMessage());
+            logger.warning("Invalid department: " + e.getMessage());
+            showAlert("Error", e.getMessage());
         } catch (Exception e) {
-            showAlert("Error", "An unexpected error occurred: " + e.getMessage());
-            logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage());
+            logger.severe("Error adding employee: " + e.getMessage());
+            showAlert("Error", "Failed to add employee: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleRemoveEmployee() {
-        try {
-            Employee<Integer> selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
-            if (selectedEmployee == null) {
-                showAlert("Selection Error", "Please select an employee to remove");
-                return;
-            }
+        if (nameField.getText().isEmpty()) {
+            showAlert("Error", "Please enter an employee name to remove");
+            return;
+        }
 
-            employeeDatabase.removeEmployee(selectedEmployee.getEmployeeId());
-            logger.log(Level.INFO, "Employee removed successfully: " + selectedEmployee.getEmployeeId());
-            
+        try {
+            String name = nameField.getText();
+            employeeDatabase.removeEmployee(name);
             refreshEmployeeList();
-            showSuccessAlert("Success", "Employee removed successfully");
-            
-        } catch (EmployeeNotFoundException e) {
-            showAlert("Error", e.getMessage());
-            logger.log(Level.WARNING, "Employee not found: " + e.getMessage());
+            clearFields();
         } catch (Exception e) {
-            showAlert("Error", "An unexpected error occurred: " + e.getMessage());
-            logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage());
+            logger.severe("Error removing employee: " + e.getMessage());
+            showAlert("Error", "Failed to remove employee: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleUpdateEmployee() {
-        try {
-            Employee<Integer> selectedEmployee = employeeTable.getSelectionModel().getSelectedItem();
-            if (selectedEmployee == null) {
-                showAlert("Selection Error", "Please select an employee to update");
-                return;
+        // Validate name first
+        validateName(nameField.getText());
+        
+        if (nameErrorLabel.getText().isEmpty()) {
+            try {
+                String name = nameField.getText();
+                
+                // Check if employee with this name exists
+                if (employeeDatabase.getEmployee(name) == null) {
+                    nameErrorLabel.setText("No employee found with this name");
+                    return;
+                }
+                
+                // Validate only the fields that are being updated
+                String field = getSelectedField();
+                if (field == null) {
+                    showAlert("Update Error", "Please enter a value in at least one field to update");
+                    return;
+                }
+                
+                switch (field) {
+                    case "department" -> validateDepartment(departmentField.getValue());
+                    case "salary" -> validateSalary(salaryField.getText());
+                    case "performancerating" -> validateRating(ratingField.getValue() != null ? ratingField.getValue().toString() : "");
+                    case "yearsofexperience" -> validateExperience(experienceField.getText());
+                }
+                
+                if (!isFormValid()) {
+                    showAlert("Validation Error", "Please fix the errors in the form");
+                    return;
+                }
+                
+                Object newValue = getNewValue(field);
+                if (newValue != null) {
+                    employeeDatabase.updateEmployeeDetails(name, field, newValue);
+                    refreshEmployeeList();
+                    clearFields();
+                    clearErrorLabels();
+                }
+            } catch (Exception e) {
+                logger.severe("Error updating employee: " + e.getMessage());
+                showAlert("Error", "Failed to update employee: " + e.getMessage());
             }
-
-            String field = getSelectedField();
-            if (field == null) {
-                showAlert("Selection Error", "Please select a field to update");
-                return;
-            }
-
-            Object newValue = getNewValue(field);
-            if (newValue == null) {
-                showAlert("Input Error", "Please enter a valid value");
-                return;
-            }
-
-            employeeDatabase.updateEmployeeDetails(
-                selectedEmployee.getEmployeeId(),
-                field,
-                newValue
-            );
-            
-            logger.log(Level.INFO, "Employee updated successfully: " + selectedEmployee.getEmployeeId());
-            
-            refreshEmployeeList();
-            showSuccessAlert("Success", "Employee updated successfully");
-            
-        } catch (EmployeeNotFoundException e) {
-            showAlert("Error", e.getMessage());
-            logger.log(Level.WARNING, "Employee not found: " + e.getMessage());
-        } catch (InvalidSalaryException e) {
-            showAlert("Error", e.getMessage());
-            logger.log(Level.WARNING, "Invalid salary: " + e.getMessage());
-        } catch (InvalidDepartmentException e) {
-            showAlert("Error", e.getMessage());
-            logger.log(Level.WARNING, "Invalid department: " + e.getMessage());
-        } catch (Exception e) {
-            showAlert("Error", "An unexpected error occurred: " + e.getMessage());
-            logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage());
+        } else {
+            showAlert("Validation Error", "Please fix the errors in the name field");
         }
     }
 
@@ -347,91 +356,110 @@ public class EmployeeController {
     @FXML
     private void handleSearch() {
         try {
-            String searchTerm = searchField.getText().trim();
-            if (searchTerm.isEmpty()) {
-                refreshEmployeeList();
-                return;
-            }
-
-            List<Employee<Integer>> searchResults = employeeDatabase.searchEmployeesByName(searchTerm);
-            employeeList.setAll(searchResults);
+            String searchText = searchField.getText().toLowerCase();
+            String selectedDepartment = departmentFilterField.getValue();
             
-            if (searchResults.isEmpty()) {
-                showAlert("Search Results", "No employees found matching the search criteria");
-            }
+            List<Employee<Integer>> filteredEmployees = employeeDatabase.getAllEmployees().stream()
+                .filter(emp -> {
+                    boolean matchesDepartment = selectedDepartment.equals("All Departments") || 
+                                              emp.getDepartment().equals(selectedDepartment);
+                    boolean matchesSearch = emp.getName().toLowerCase().contains(searchText) ||
+                                          emp.getDepartment().toLowerCase().contains(searchText);
+                    return matchesDepartment && matchesSearch;
+                })
+                .collect(Collectors.toList());
             
+            employeeList.setAll(filteredEmployees);
+            logger.info("Search completed. Found " + filteredEmployees.size() + " employees");
         } catch (Exception e) {
-            showAlert("Error", "An error occurred during search: " + e.getMessage());
-            logger.log(Level.SEVERE, "Search error: " + e.getMessage());
+            logger.severe("Error during search: " + e.getMessage());
+            showAlert("Error", "Failed to perform search");
         }
     }
 
     @FXML
     private void handleSortByExperience() {
         try {
-            List<Employee<Integer>> sortedList = employeeDatabase.sortByExperience();
-            employeeList.setAll(sortedList);
+            employeeList.sort((e1, e2) -> Integer.compare(e2.getYearsOfExperience(), e1.getYearsOfExperience()));
+            logger.info("Sorted employees by experience");
         } catch (Exception e) {
-            showAlert("Error", "An error occurred during sorting: " + e.getMessage());
-            logger.log(Level.SEVERE, "Sorting error: " + e.getMessage());
+            logger.severe("Error sorting by experience: " + e.getMessage());
+            showAlert("Error", "Failed to sort employees");
         }
     }
 
     @FXML
     private void handleSortBySalary() {
         try {
-            List<Employee<Integer>> sortedList = employeeDatabase.sortBySalary();
-            employeeList.setAll(sortedList);
+            employeeList.sort((e1, e2) -> Double.compare(e2.getSalary(), e1.getSalary()));
+            logger.info("Sorted employees by salary");
         } catch (Exception e) {
-            showAlert("Error", "An error occurred during sorting: " + e.getMessage());
-            logger.log(Level.SEVERE, "Sorting error: " + e.getMessage());
+            logger.severe("Error sorting by salary: " + e.getMessage());
+            showAlert("Error", "Failed to sort employees");
         }
     }
 
     @FXML
     private void handleSortByPerformance() {
         try {
-            List<Employee<Integer>> sortedList = employeeDatabase.sortByPerformance();
-            employeeList.setAll(sortedList);
+            employeeList.sort((e1, e2) -> Double.compare(e2.getPerformanceRating(), e1.getPerformanceRating()));
+            logger.info("Sorted employees by performance");
         } catch (Exception e) {
-            showAlert("Error", "An error occurred during sorting: " + e.getMessage());
-            logger.log(Level.SEVERE, "Sorting error: " + e.getMessage());
+            logger.severe("Error sorting by performance: " + e.getMessage());
+            showAlert("Error", "Failed to sort employees");
         }
     }
 
     @FXML
     private void handleRaiseSalary() {
+        if (nameField.getText().isEmpty()) {
+            showAlert("Error", "Please enter an employee name to apply raise");
+            return;
+        }
+
         try {
-            String department = departmentAnalyticsField.getValue();
-            if (department == null || department.isEmpty()) {
-                showAlert("Input Error", "Please select a department");
+            String name = nameField.getText();
+            Employee<Integer> employee = employeeDatabase.getEmployee(name);
+            
+            if (employee == null) {
+                showAlert("Error", "No employee found with this name");
                 return;
             }
 
-            double averageSalary = employeeDatabase.getAverageDepartmentSalary(department);
-            analyticsOutput.setText(String.format("Average salary in %s: $%.2f", department, averageSalary));
+            // Calculate raise based on performance rating
+            double currentRating = employee.getPerformanceRating();
+            double raisePercentage = calculateRaisePercentage(currentRating);
+            double currentSalary = employee.getSalary();
+            double newSalary = currentSalary * (1 + raisePercentage/100);
+
+            // Update the employee's salary
+            employeeDatabase.updateEmployeeDetails(name, "salary", newSalary);
+            refreshEmployeeList();
             
+            // Console output for salary raise
+            System.out.println("\n=== Salary Raise Applied ===");
+            System.out.printf("Employee: %s\nPrevious Salary: $%.2f\nRaise Percentage: %.1f%%\nNew Salary: $%.2f\n",
+                employee.getName(), currentSalary, raisePercentage, newSalary);
+            System.out.println("===========================\n");
+            
+            // Show success message
+            showSuccessAlert("Salary Raise Applied", 
+                String.format("Employee %s received a %.1f%% raise.\nNew salary: $%.2f", 
+                    employee.getName(), raisePercentage, newSalary));
         } catch (Exception e) {
-            showAlert("Error", "An error occurred while calculating average salary: " + e.getMessage());
-            logger.log(Level.SEVERE, "Salary calculation error: " + e.getMessage());
+            logger.severe("Error raising salary: " + e.getMessage());
+            showAlert("Error", "Failed to raise salary: " + e.getMessage());
         }
     }
 
-    private void refreshEmployeeList() {
-        try {
-            employeeList.setAll(employeeDatabase.getAllEmployees());
-        } catch (Exception e) {
-            showAlert("Error", "An error occurred while refreshing the employee list: " + e.getMessage());
-            logger.log(Level.SEVERE, "Refresh error: " + e.getMessage());
-        }
-    }
-
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private double calculateRaisePercentage(double rating) {
+        // Performance-based raise calculation
+        if (rating >= 4.5) return 10.0;  // Outstanding
+        if (rating >= 4.0) return 8.0;   // Excellent
+        if (rating >= 3.5) return 6.0;   // Very Good
+        if (rating >= 3.0) return 4.0;   // Good
+        if (rating >= 2.0) return 2.0;   // Satisfactory
+        return 0.0;                      // Needs Improvement
     }
 
     private void showSuccessAlert(String title, String content) {
@@ -442,16 +470,27 @@ public class EmployeeController {
         alert.showAndWait();
     }
 
+    private void refreshEmployeeList() {
+        try {
+            employeeList.setAll(employeeDatabase.getAllEmployees());
+            logger.info("Refreshed employee list with " + employeeList.size() + " employees");
+        } catch (Exception e) {
+            logger.severe("Error refreshing employee list: " + e.getMessage());
+            showAlert("Error", "Failed to refresh employee list");
+        }
+    }
+
     private void clearFields() {
-        employeeIdField.clear();
         nameField.clear();
         departmentField.setValue(null);
         salaryField.clear();
         ratingField.setValue(null);
         experienceField.clear();
-        
-        // Clear error labels
-        idErrorLabel.setText("");
+        departmentAnalyticsField.setValue(null);
+        clearErrorLabels();
+    }
+    
+    private void clearErrorLabels() {
         nameErrorLabel.setText("");
         departmentErrorLabel.setText("");
         salaryErrorLabel.setText("");
@@ -460,15 +499,31 @@ public class EmployeeController {
     }
 
     private String getSelectedField() {
-        // Implementation depends on how field selection is handled in the UI
-        // This is a placeholder - you'll need to implement based on your UI
+        if (!nameField.getText().isEmpty()) return "name";
+        if (departmentField.getValue() != null) return "department";
+        if (!salaryField.getText().isEmpty()) return "salary";
+        if (ratingField.getValue() != null) return "performancerating";
+        if (!experienceField.getText().isEmpty()) return "yearsofexperience";
         return null;
     }
 
     private Object getNewValue(String field) {
-        // Implementation depends on how new values are entered in the UI
-        // This is a placeholder - you'll need to implement based on your UI
-        return null;
+        if (field == null) return null;
+        return switch (field) {
+            case "department" -> departmentField.getValue();
+            case "salary" -> Double.parseDouble(salaryField.getText());
+            case "performancerating" -> ratingField.getValue();
+            case "yearsofexperience" -> Integer.parseInt(experienceField.getText());
+            default -> null;
+        };
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
