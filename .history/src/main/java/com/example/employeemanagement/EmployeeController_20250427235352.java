@@ -424,14 +424,47 @@ public class EmployeeController {
             showAlert("Error", "An error occurred while refreshing the employee list: " + e.getMessage());
             logger.log(Level.SEVERE, "Refresh error: " + e.getMessage());
         }
+            Integer id = Integer.parseInt(employeeIdField.getText());
+            Employee<Integer> employee = employeeDatabase.getEmployee(id);
+            
+            if (employee == null) {
+                showAlert("Error", "No employee found with this ID");
+                return;
+            }
+
+            // Calculate raise based on performance rating
+            double currentRating = employee.getPerformanceRating();
+            double raisePercentage = calculateRaisePercentage(currentRating);
+            double currentSalary = employee.getSalary();
+            double newSalary = currentSalary * (1 + raisePercentage/100);
+
+            // Update the employee's salary
+            employeeDatabase.updateEmployeeDetails(id, "salary", newSalary);
+            refreshEmployeeList();
+            
+            // Console output for salary raise
+            System.out.println("\n=== Salary Raise Applied ===");
+            System.out.printf("Employee: %s\nPrevious Salary: $%.2f\nRaise Percentage: %.1f%%\nNew Salary: $%.2f\n",
+                employee.getName(), currentSalary, raisePercentage, newSalary);
+            System.out.println("===========================\n");
+            
+            // Show success message
+            showSuccessAlert("Salary Raise Applied", 
+                String.format("Employee %s received a %.1f%% raise.\nNew salary: $%.2f", 
+                    employee.getName(), raisePercentage, newSalary));
+        } catch (NumberFormatException e) {
+            showAlert("Invalid Input", "Please enter a valid employee ID.");
+        }
     }
 
-    private void showAlert(String title, String content) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(content);
-        alert.showAndWait();
+    private double calculateRaisePercentage(double rating) {
+        // Performance-based raise calculation
+        if (rating >= 4.5) return 10.0;  // Outstanding
+        if (rating >= 4.0) return 8.0;   // Excellent
+        if (rating >= 3.5) return 6.0;   // Very Good
+        if (rating >= 3.0) return 4.0;   // Good
+        if (rating >= 2.0) return 2.0;   // Satisfactory
+        return 0.0;                      // Needs Improvement
     }
 
     private void showSuccessAlert(String title, String content) {
@@ -442,6 +475,10 @@ public class EmployeeController {
         alert.showAndWait();
     }
 
+    private void refreshEmployeeList() {
+        employeeList.setAll(employeeDatabase.getAllEmployees());
+    }
+
     private void clearFields() {
         employeeIdField.clear();
         nameField.clear();
@@ -449,8 +486,10 @@ public class EmployeeController {
         salaryField.clear();
         ratingField.setValue(null);
         experienceField.clear();
-        
-        // Clear error labels
+        departmentAnalyticsField.setValue(null);
+    }
+    
+    private void clearErrorLabels() {
         idErrorLabel.setText("");
         nameErrorLabel.setText("");
         departmentErrorLabel.setText("");
@@ -460,15 +499,32 @@ public class EmployeeController {
     }
 
     private String getSelectedField() {
-        // Implementation depends on how field selection is handled in the UI
-        // This is a placeholder - you'll need to implement based on your UI
+        if (!nameField.getText().isEmpty()) return "name";
+        if (departmentField.getValue() != null) return "department";
+        if (!salaryField.getText().isEmpty()) return "salary";
+        if (ratingField.getValue() != null) return "performancerating";
+        if (!experienceField.getText().isEmpty()) return "yearsofexperience";
         return null;
     }
 
     private Object getNewValue(String field) {
-        // Implementation depends on how new values are entered in the UI
-        // This is a placeholder - you'll need to implement based on your UI
-        return null;
+        if (field == null) return null;
+        return switch (field) {
+            case "name" -> nameField.getText();
+            case "department" -> departmentField.getValue();
+            case "salary" -> Double.parseDouble(salaryField.getText());
+            case "performancerating" -> ratingField.getValue();
+            case "yearsofexperience" -> Integer.parseInt(experienceField.getText());
+            default -> null;
+        };
+    }
+
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 
     @FXML
