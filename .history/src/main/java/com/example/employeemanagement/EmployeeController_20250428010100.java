@@ -18,11 +18,18 @@ import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+@Controller
+@RequestMapping("/employees")
 public class EmployeeController {
     private static final Logger LOGGER = Logger.getLogger(EmployeeController.class.getName());
     private final EmployeeDatabase<Integer> employeeDatabase = new EmployeeDatabase<>();
     private final ObservableList<Employee<Integer>> employeeList = FXCollections.observableArrayList();
 
+    @FXML private TextField employeeIdField;
     @FXML private TextField nameField;
     @FXML private ComboBox<String> departmentField;
     @FXML private TextField salaryField;
@@ -39,6 +46,7 @@ public class EmployeeController {
     @FXML private TableColumn<Employee<Integer>, Integer> experienceColumn;
     
     // Error labels
+    @FXML private Label idErrorLabel;
     @FXML private Label nameErrorLabel;
     @FXML private Label departmentErrorLabel;
     @FXML private Label salaryErrorLabel;
@@ -53,18 +61,12 @@ public class EmployeeController {
     @FXML private ComboBox<String> departmentAnalyticsField;
     @FXML private TextArea analyticsOutput;
 
-    // Action buttons
-    @FXML private Button updateButton;
-    @FXML private Button removeButton;
-    @FXML private Button raiseButton;
-
     @FXML
     public void initialize() {
         try {
             setupTableColumns();
             setupComboBoxes();
             setupValidation();
-            setupTableSelectionListener();
             refreshEmployeeList();
             LOGGER.log(Level.INFO, "EmployeeController initialized successfully");
         } catch (Exception e) {
@@ -130,6 +132,7 @@ public class EmployeeController {
 
     private void setupValidation() {
         try {
+            employeeIdField.textProperty().addListener((obs, oldVal, newVal) -> validateId(newVal));
             nameField.textProperty().addListener((obs, oldVal, newVal) -> validateName(newVal));
             departmentField.valueProperty().addListener((obs, oldVal, newVal) -> validateDepartment(newVal));
             salaryField.textProperty().addListener((obs, oldVal, newVal) -> validateSalary(newVal));
@@ -139,6 +142,24 @@ public class EmployeeController {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error setting up validation", e);
             throw e;
+        }
+    }
+
+    private void validateId(String value) {
+        try {
+            if (value.isEmpty()) {
+                idErrorLabel.setText("Employee ID is required");
+                return;
+            }
+            Integer id = Integer.parseInt(value);
+            if (id <= 0) {
+                idErrorLabel.setText("ID must be a positive number");
+            } else {
+                idErrorLabel.setText("");
+            }
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.WARNING, "Invalid ID format: {0}", value);
+            idErrorLabel.setText("ID must be a valid number");
         }
     }
 
@@ -224,56 +245,55 @@ public class EmployeeController {
     }
 
     private boolean isFormValid() {
-        return nameErrorLabel.getText().isEmpty() &&
+        return idErrorLabel.getText().isEmpty() &&
+               nameErrorLabel.getText().isEmpty() &&
                departmentErrorLabel.getText().isEmpty() &&
                salaryErrorLabel.getText().isEmpty() &&
                ratingErrorLabel.getText().isEmpty() &&
                experienceErrorLabel.getText().isEmpty();
     }
 
-    private void setupTableSelectionListener() {
-        employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            boolean hasSelection = newSelection != null;
-            updateButton.setVisible(hasSelection);
-            removeButton.setVisible(hasSelection);
-            raiseButton.setVisible(hasSelection);
-            
-            if (hasSelection) {
-                nameField.setText(newSelection.getName());
-                departmentField.setValue(newSelection.getDepartment());
-                salaryField.setText(String.valueOf(newSelection.getSalary()));
-                ratingField.setValue((int) newSelection.getPerformanceRating());
-                experienceField.setText(String.valueOf(newSelection.getYearsOfExperience()));
-            } else {
-                clearFields();
-            }
-        });
-    }
-
     @FXML
     private void handleAddEmployee() {
         try {
+            // Validate all fields first
+            validateId(employeeIdField.getText());
+            validateName(nameField.getText());
+            validateDepartment(departmentField.getValue());
+            validateSalary(salaryField.getText());
+            validateRating(ratingField.getValue() != null ? ratingField.getValue().toString() : "");
+            validateExperience(experienceField.getText());
+            
             if (!isFormValid()) {
                 LOGGER.log(Level.WARNING, "Form validation failed");
+                showAlert("Validation Error", "Please fix the errors in the form");
                 return;
             }
 
+            Integer id = Integer.parseInt(employeeIdField.getText());
             String name = nameField.getText();
             String department = departmentField.getValue();
             double salary = Double.parseDouble(salaryField.getText());
-            int rating = ratingField.getValue() != null ? ratingField.getValue() : 0;
-            int experience = experienceField.getText().isEmpty() ? 0 : Integer.parseInt(experienceField.getText());
+            double rating = ratingField.getValue() != null ? ratingField.getValue() : 0;
+            int experience = Integer.parseInt(experienceField.getText());
 
-            Employee<Integer> employee = new Employee<>(name, department, salary);
-            employee.setPerformanceRating(rating);
-            employee.setYearsOfExperience(experience);
-
+            Employee<Integer> employee = new Employee<>(id, name, department, salary, rating, experience);
             employeeDatabase.addEmployee(employee);
+            
+            LOGGER.log(Level.INFO, "Added new employee: {0}", employee);
             refreshEmployeeList();
             clearFields();
-            clearErrorLabels();
-            showSuccessAlert("Success", "Employee added successfully with ID: " + employee.getEmployeeId());
-            LOGGER.log(Level.INFO, "Added new employee with auto-generated ID: {0}", employee.getEmployeeId());
+            showSuccessAlert("Success", "Employee added successfully");
+            
+        } catch (InvalidSalaryException e) {
+            LOGGER.log(Level.SEVERE, "Invalid salary", e);
+            showAlert("Error", "Invalid salary: " + e.getMessage());
+        } catch (InvalidDepartmentException e) {
+            LOGGER.log(Level.SEVERE, "Invalid department", e);
+            showAlert("Error", "Invalid department: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Invalid number format", e);
+            showAlert("Error", "Please check the numeric fields");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error adding employee", e);
             showAlert("Error", "Failed to add employee: " + e.getMessage());
@@ -469,14 +489,18 @@ public class EmployeeController {
     }
 
     private void clearFields() {
+        employeeIdField.clear();
         nameField.clear();
         departmentField.setValue(null);
         salaryField.clear();
         ratingField.setValue(null);
         experienceField.clear();
+        clearErrorLabels();
+        LOGGER.log(Level.INFO, "Input fields cleared");
     }
 
     private void clearErrorLabels() {
+        idErrorLabel.setText("");
         nameErrorLabel.setText("");
         departmentErrorLabel.setText("");
         salaryErrorLabel.setText("");
@@ -591,6 +615,87 @@ public class EmployeeController {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error calculating average salary", e);
             showAlert("Error", "Failed to calculate average salary: " + e.getMessage());
+        }
+    }
+
+    @GetMapping
+    public String listEmployees(Model model) {
+        model.addAttribute("employees", employeeDatabase.getAllEmployees());
+        return "index";
+    }
+
+    @PostMapping
+    public String addEmployee(@RequestParam String name, 
+                            @RequestParam String department,
+                            @RequestParam double salary) {
+        try {
+            Employee<Integer> employee = new Employee<>(name, department, salary);
+            employeeDatabase.addEmployee(employee);
+        } catch (InvalidSalaryException | InvalidDepartmentException e) {
+            // Handle validation errors
+        }
+        return "redirect:/employees";
+    }
+
+    @GetMapping("/{id}/update")
+    public String showUpdateForm(@PathVariable Integer id, Model model) {
+        try {
+            Employee<Integer> employee = employeeDatabase.getEmployee(id);
+            model.addAttribute("employee", employee);
+            return "update-employee";
+        } catch (EmployeeNotFoundException e) {
+            return "redirect:/employees";
+        }
+    }
+
+    @PostMapping("/{id}/update")
+    public String updateEmployee(@PathVariable Integer id,
+                               @RequestParam String name,
+                               @RequestParam String department,
+                               @RequestParam double salary) {
+        try {
+            employeeDatabase.updateEmployeeDetails(id, "name", name);
+            employeeDatabase.updateEmployeeDetails(id, "department", department);
+            employeeDatabase.updateEmployeeDetails(id, "salary", salary);
+        } catch (EmployeeNotFoundException | InvalidSalaryException | InvalidDepartmentException e) {
+            // Handle validation errors
+        }
+        return "redirect:/employees";
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public String deleteEmployee(@PathVariable Integer id) {
+        try {
+            employeeDatabase.removeEmployee(id);
+            return "Employee deleted successfully";
+        } catch (EmployeeNotFoundException e) {
+            return "Employee not found";
+        }
+    }
+
+    @PostMapping("/{id}/raise-salary")
+    @ResponseBody
+    public String giveSalaryRaise(@PathVariable Integer id,
+                                @RequestBody SalaryRaiseRequest request) {
+        try {
+            employeeDatabase.giveSalaryRaise(request.getPercentage(), 0.0);
+            return "Salary raised successfully";
+        } catch (InvalidSalaryException e) {
+            return "Invalid salary raise percentage";
+        }
+    }
+
+    // Helper class for salary raise request
+    private static class SalaryRaiseRequest {
+        private double percentage;
+
+        public double getPercentage() {
+            return percentage;
+        }
+
+        public void setPercentage(double percentage) {
+            this.percentage = percentage;
         }
     }
 }

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.employeemanagement.EmployeeController"
+      spacing="10" padding="10">
+
+    <Text text="Employee Management System" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    
+    <GridPane hgap="10" vgap="10">
+        <Label text="Name:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+        <TextField fx:id="nameField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+        
+        <Label text="Department:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <TextField fx:id="departmentField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        
+        <Label text="Salary:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <TextField fx:id="salaryField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        
+        <Button text="Save" onAction="#handleSave" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+    </GridPane>
+
+    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID"/>
+            <TableColumn fx:id="nameColumn" text="Name"/>
+            <TableColumn fx:id="departmentColumn" text="Department"/>
+            <TableColumn fx:id="salaryColumn" text="Salary"/>
+            <TableColumn fx:id="ratingColumn" text="Performance Rating"/>
+            <TableColumn fx:id="experienceColumn" text="Years of Experience"/>
+        </columns>
+        <contextMenu>
+            <ContextMenu>
+                <MenuItem text="Update" onAction="#handleUpdate"/>
+                <MenuItem text="Delete" onAction="#handleDelete"/>
+                <MenuItem text="Give Raise" onAction="#handleRaise"/>
+            </ContextMenu>
+        </contextMenu>
+    </TableView>
+</VBox> 

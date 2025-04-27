@@ -53,18 +53,12 @@ public class EmployeeController {
     @FXML private ComboBox<String> departmentAnalyticsField;
     @FXML private TextArea analyticsOutput;
 
-    // Action buttons
-    @FXML private Button updateButton;
-    @FXML private Button removeButton;
-    @FXML private Button raiseButton;
-
     @FXML
     public void initialize() {
         try {
             setupTableColumns();
             setupComboBoxes();
             setupValidation();
-            setupTableSelectionListener();
             refreshEmployeeList();
             LOGGER.log(Level.INFO, "EmployeeController initialized successfully");
         } catch (Exception e) {
@@ -229,25 +223,6 @@ public class EmployeeController {
                salaryErrorLabel.getText().isEmpty() &&
                ratingErrorLabel.getText().isEmpty() &&
                experienceErrorLabel.getText().isEmpty();
-    }
-
-    private void setupTableSelectionListener() {
-        employeeTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-            boolean hasSelection = newSelection != null;
-            updateButton.setVisible(hasSelection);
-            removeButton.setVisible(hasSelection);
-            raiseButton.setVisible(hasSelection);
-            
-            if (hasSelection) {
-                nameField.setText(newSelection.getName());
-                departmentField.setValue(newSelection.getDepartment());
-                salaryField.setText(String.valueOf(newSelection.getSalary()));
-                ratingField.setValue((int) newSelection.getPerformanceRating());
-                experienceField.setText(String.valueOf(newSelection.getYearsOfExperience()));
-            } else {
-                clearFields();
-            }
-        });
     }
 
     @FXML

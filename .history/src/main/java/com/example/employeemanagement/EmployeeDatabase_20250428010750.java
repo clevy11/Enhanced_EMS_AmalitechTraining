@@ -18,7 +18,7 @@ public class EmployeeDatabase<T> {
     }
 
     // CRUD Operations
-    public T addEmployee(Employee<T> employee) {
+    public void addEmployee(Employee<T> employee) {
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Attempted to add null employee");
             throw new IllegalArgumentException("Employee cannot be null");
@@ -30,7 +30,6 @@ public class EmployeeDatabase<T> {
         employees.put(employee.getEmployeeId(), employee);
         employeeList.add(employee);
         LOGGER.log(Level.INFO, "Added new employee with ID: {0}", employee.getEmployeeId());
-        return employee.getEmployeeId();
     }
 
     public Employee<T> getEmployee(T employeeId) throws EmployeeNotFoundException {

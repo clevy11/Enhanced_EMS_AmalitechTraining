@@ -15,8 +15,6 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.MenuItem?>
 
 <VBox prefHeight="486.0" prefWidth="1242.0" styleClass="main-container" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.employeemanagement.EmployeeController">
     
@@ -97,17 +95,20 @@
                         <Insets right="10" />
                     </HBox.margin>
                 </Button>
-                <Button fx:id="updateButton" onAction="#handleUpdateEmployee" styleClass="action-button" text="Update" visible="false">
+                <Button onAction="#handleUpdateEmployee" styleClass="action-button" text="Update">
                     <HBox.margin>
                         <Insets right="4.0" />
                     </HBox.margin>
                 </Button>
-                <Button fx:id="removeButton" onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove" visible="false">
+                <Button onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove">
                     <HBox.margin>
                         <Insets right="10" />
                     </HBox.margin>
                 </Button>
-                <Button fx:id="raiseButton" onAction="#handleRaiseSalary" styleClass="raise-button" text="Raise Salary" visible="false" />
+                <Button onAction="#handleRaiseSalary" styleClass="raise-button" text="Raise Salary" />
+            <padding>
+               <Insets left="-330.0" top="-1.0" />
+            </padding>
             </HBox>
         </VBox>
 
@@ -144,15 +145,6 @@
                     <TableColumn fx:id="ratingColumn" prefWidth="132.66665649414062" styleClass="table-column" text="Rating" />
                     <TableColumn fx:id="experienceColumn" prefWidth="134.6666259765625" styleClass="table-column" text="Experience" />
                 </columns>
-                <contextMenu>
-                    <ContextMenu>
-                        <items>
-                            <MenuItem text="Update" onAction="#handleUpdateEmployee" />
-                            <MenuItem text="Remove" onAction="#handleRemoveEmployee" />
-                            <MenuItem text="Raise Salary" onAction="#handleRaiseSalary" />
-                        </items>
-                    </ContextMenu>
-                </contextMenu>
             </TableView>
         </VBox>
     </HBox>

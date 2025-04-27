@@ -35,19 +35,6 @@ public class Employee<T> implements Comparable<Employee<T>> {
         LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
     }
 
-    public Employee(String name, String department, double salary, double performanceRating, int yearsOfExperience) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-        this.performanceRating = performanceRating;
-        this.yearsOfExperience = yearsOfExperience;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
-    }
-
     private void validateSalary(double salary) throws InvalidSalaryException {
         if (salary < 0) {
             LOGGER.log(Level.SEVERE, "Attempted to set invalid salary: {0}", salary);

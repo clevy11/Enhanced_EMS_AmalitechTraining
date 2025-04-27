@@ -10,6 +10,7 @@ public class EmployeeDatabase<T> {
     private static final Logger LOGGER = Logger.getLogger(EmployeeDatabase.class.getName());
     private final Map<T, Employee<T>> employees;
     private final List<Employee<T>> employeeList;
+    private int nextId = 1; // Auto-increment counter
 
     public EmployeeDatabase() {
         this.employees = new HashMap<>();
@@ -18,19 +19,23 @@ public class EmployeeDatabase<T> {
     }
 
     // CRUD Operations
-    public T addEmployee(Employee<T> employee) {
+    public void addEmployee(Employee<T> employee) {
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Attempted to add null employee");
             throw new IllegalArgumentException("Employee cannot be null");
         }
+        
+        // Set auto-incremented ID
+        employee.setEmployeeId((T) Integer.valueOf(nextId++));
+        
         if (employees.containsKey(employee.getEmployeeId())) {
             LOGGER.log(Level.SEVERE, "Employee with ID {0} already exists", employee.getEmployeeId());
             throw new IllegalArgumentException("Employee with this ID already exists");
         }
+        
         employees.put(employee.getEmployeeId(), employee);
         employeeList.add(employee);
         LOGGER.log(Level.INFO, "Added new employee with ID: {0}", employee.getEmployeeId());
-        return employee.getEmployeeId();
     }
 
     public Employee<T> getEmployee(T employeeId) throws EmployeeNotFoundException {

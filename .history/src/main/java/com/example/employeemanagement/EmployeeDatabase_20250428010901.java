@@ -10,27 +10,65 @@ public class EmployeeDatabase<T> {
     private static final Logger LOGGER = Logger.getLogger(EmployeeDatabase.class.getName());
     private final Map<T, Employee<T>> employees;
     private final List<Employee<T>> employeeList;
+    private T nextId;
 
     public EmployeeDatabase() {
         this.employees = new HashMap<>();
         this.employeeList = new ArrayList<>();
+        this.nextId = null;
         LOGGER.log(Level.INFO, "Initialized new EmployeeDatabase");
     }
 
     // CRUD Operations
-    public T addEmployee(Employee<T> employee) {
+    public void addEmployee(Employee<T> employee) {
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Attempted to add null employee");
             throw new IllegalArgumentException("Employee cannot be null");
         }
+        
+        // Auto-increment ID
+        if (employee.getEmployeeId() == null) {
+            employee.setEmployeeId(generateNextId());
+        }
+        
         if (employees.containsKey(employee.getEmployeeId())) {
             LOGGER.log(Level.SEVERE, "Employee with ID {0} already exists", employee.getEmployeeId());
             throw new IllegalArgumentException("Employee with this ID already exists");
         }
+        
         employees.put(employee.getEmployeeId(), employee);
         employeeList.add(employee);
         LOGGER.log(Level.INFO, "Added new employee with ID: {0}", employee.getEmployeeId());
-        return employee.getEmployeeId();
+    }
+
+    @SuppressWarnings("unchecked")
+    private T generateNextId() {
+        if (nextId == null) {
+            if (employeeList.isEmpty()) {
+                nextId = (T) Integer.valueOf(1);
+            } else {
+                // Find the maximum ID and increment it
+                T maxId = employeeList.stream()
+                    .map(Employee::getEmployeeId)
+                    .filter(Objects::nonNull)
+                    .max((id1, id2) -> {
+                        if (id1 instanceof Integer && id2 instanceof Integer) {
+                            return Integer.compare((Integer) id1, (Integer) id2);
+                        }
+                        return 0;
+                    })
+                    .orElse((T) Integer.valueOf(0));
+                
+                if (maxId instanceof Integer) {
+                    nextId = (T) Integer.valueOf(((Integer) maxId) + 1);
+                }
+            }
+        } else {
+            if (nextId instanceof Integer) {
+                nextId = (T) Integer.valueOf(((Integer) nextId) + 1);
+            }
+        }
+        return nextId;
     }
 
     public Employee<T> getEmployee(T employeeId) throws EmployeeNotFoundException {

@@ -11,17 +11,14 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 public class EmployeeDebugTest {
     private EmployeeDatabase<Integer> database;
-    private Integer employee1Id;
-    private Integer employee2Id;
-    private Integer employee3Id;
 
     @BeforeEach
     void setUp() throws InvalidSalaryException, InvalidDepartmentException {
         database = new EmployeeDatabase<>();
         // Add some test employees
-        employee1Id = database.addEmployee(new Employee<>("John Doe", "IT", 50000.0));
-        employee2Id = database.addEmployee(new Employee<>("Jane Smith", "HR", 60000.0));
-        employee3Id = database.addEmployee(new Employee<>("Bob Wilson", "IT", 55000.0));
+        database.addEmployee(new Employee<>(1, "John Doe", "IT", 50000.0, 4.5, 5));
+        database.addEmployee(new Employee<>(2, "Jane Smith", "HR", 60000.0, 4.0, 3));
+        database.addEmployee(new Employee<>(3, "Bob Wilson", "IT", 55000.0, 4.2, 4));
     }
 
     /**
@@ -38,7 +35,7 @@ public class EmployeeDebugTest {
         database.giveSalaryRaise(10.0, 4.0);
         
         // Get the updated salary for employee 1
-        Employee<Integer> employee = database.getEmployee(employee1Id);
+        Employee<Integer> employee = database.getEmployee(1);
         double expectedSalary = 55000.0; // 50000 * 1.10
         double actualSalary = employee.getSalary();
         
@@ -72,11 +69,11 @@ public class EmployeeDebugTest {
     @Test
     void debugPerformanceRatingCalculation() throws EmployeeNotFoundException, 
             InvalidSalaryException, InvalidDepartmentException {
-        Employee<Integer> employee = database.getEmployee(employee1Id);
+        Employee<Integer> employee = database.getEmployee(1);
         
         // Update performance rating and verify
         double newRating = 4.8;
-        database.updateEmployeeDetails(employee1Id, "performancerating", newRating);
+        database.updateEmployeeDetails(1, "performancerating", newRating);
         
         assertEquals(newRating, employee.getPerformanceRating(),
                 String.format("Performance rating update failed. Expected: %.1f, Got: %.1f",

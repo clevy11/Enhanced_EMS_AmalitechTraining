@@ -120,7 +120,7 @@ public class EmployeeDatabaseTest {
     }
 
     @Test
-    void testGiveSalaryRaise() throws InvalidSalaryException, EmployeeNotFoundException, InvalidDepartmentException {
+    void testGiveSalaryRaise() throws InvalidSalaryException, EmployeeNotFoundException {
         // Set performance rating to 4.5 to qualify for the raise
         database.updateEmployeeDetails(testEmployeeId, "performancerating", 4.5);
         database.giveSalaryRaise(10.0, 4.0);

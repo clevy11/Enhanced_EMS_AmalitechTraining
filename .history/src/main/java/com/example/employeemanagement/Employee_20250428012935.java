@@ -7,14 +7,14 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Employee<T> implements Comparable<Employee<T>> {
-    private static int nextId = 1; // Static counter for auto-incrementing IDs
+public class Employee implements Comparable<Employee> {
     private static final Logger LOGGER = Logger.getLogger(Employee.class.getName());
     private static final Set<String> VALID_DEPARTMENTS = new HashSet<>(Arrays.asList(
         "HR", "IT", "Finance", "Marketing", "Operations", "Sales"
     ));
+    private static int nextId = 1;
     
-    private final T employeeId;
+    private final Integer employeeId;
     private String name;
     private String department;
     private double salary;
@@ -22,30 +22,21 @@ public class Employee<T> implements Comparable<Employee<T>> {
     private int yearsOfExperience;
     private boolean isActive;
 
-    public Employee(String name, String department, double salary) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-        this.performanceRating = 0.0;
-        this.yearsOfExperience = 0;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
-    }
-
-    public Employee(String name, String department, double salary, double performanceRating, int yearsOfExperience) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
+    public Employee(String name, String department, double salary, 
+                   double performanceRating, int yearsOfExperience) throws InvalidSalaryException, InvalidDepartmentException {
+        validateSalary(salary);
+        validateDepartment(department);
+        validateName(name);
+        
+        this.employeeId = nextId++;
         this.name = name;
         this.department = department;
         this.salary = salary;
         this.performanceRating = performanceRating;
         this.yearsOfExperience = yearsOfExperience;
-        validateEmployee();
         this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
+        
+        LOGGER.log(Level.INFO, "Created new employee: {0}", this.toString());
     }
 
     private void validateSalary(double salary) throws InvalidSalaryException {
@@ -89,14 +80,8 @@ public class Employee<T> implements Comparable<Employee<T>> {
         }
     }
 
-    private void validateEmployee() throws InvalidSalaryException, InvalidDepartmentException {
-        validateSalary(salary);
-        validateDepartment(department);
-        validateName(name);
-    }
-
     // Getters and Setters with validation
-    public T getEmployeeId() { return employeeId; }
+    public Integer getEmployeeId() { return employeeId; }
     public String getName() { return name; }
     public String getDepartment() { return department; }
     public double getSalary() { return salary; }
@@ -146,18 +131,15 @@ public class Employee<T> implements Comparable<Employee<T>> {
     }
 
     @Override
-    public int compareTo(Employee<T> other) {
-        if (other == null) {
-            return 1; // This object is greater than null
-        }
-        return Integer.compare(other.yearsOfExperience, this.yearsOfExperience);
+    public int compareTo(Employee other) {
+        return Integer.compare(this.employeeId, other.employeeId);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        Employee<?> employee = (Employee<?>) obj;
+        Employee employee = (Employee) obj;
         return employeeId.equals(employee.employeeId);
     }
 
@@ -168,9 +150,7 @@ public class Employee<T> implements Comparable<Employee<T>> {
 
     @Override
     public String toString() {
-        return String.format("ID: %s | Name: %s | Department: %s | Salary: $%.2f | " +
-                           "Rating: %.1f | Experience: %d years | Status: %s",
-                           employeeId, name, department, salary, performanceRating,
-                           yearsOfExperience, isActive ? "Active" : "Inactive");
+        return String.format("Employee{id=%d, name='%s', department='%s', salary=%.2f, performance=%.1f, experience=%d}",
+            employeeId, name, department, salary, performanceRating, yearsOfExperience);
     }
 } 
