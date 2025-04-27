@@ -8,13 +8,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Employee<T> implements Comparable<Employee<T>> {
-    private static int nextId = 1; // Static counter for auto-incrementing IDs
     private static final Logger LOGGER = Logger.getLogger(Employee.class.getName());
     private static final Set<String> VALID_DEPARTMENTS = new HashSet<>(Arrays.asList(
         "HR", "IT", "Finance", "Marketing", "Operations", "Sales"
     ));
     
-    private final T employeeId;
+    private static int nextId = 1;
+    
+    private final int id;
     private String name;
     private String department;
     private double salary;
@@ -22,30 +23,19 @@ public class Employee<T> implements Comparable<Employee<T>> {
     private int yearsOfExperience;
     private boolean isActive;
 
-    public Employee(String name, String department, double salary) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
+    public Employee(String name, String department, double salary) {
+        this.id = nextId++;
         this.name = name;
         this.department = department;
         this.salary = salary;
         this.performanceRating = 0.0;
         this.yearsOfExperience = 0;
-        validateEmployee();
         this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
+        LOGGER.log(Level.INFO, "Created new employee with ID: {0}", this.id);
     }
 
-    public Employee(String name, String department, double salary, double performanceRating, int yearsOfExperience) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-        this.performanceRating = performanceRating;
-        this.yearsOfExperience = yearsOfExperience;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
+    public int getId() {
+        return id;
     }
 
     private void validateSalary(double salary) throws InvalidSalaryException {
@@ -89,14 +79,7 @@ public class Employee<T> implements Comparable<Employee<T>> {
         }
     }
 
-    private void validateEmployee() throws InvalidSalaryException, InvalidDepartmentException {
-        validateSalary(salary);
-        validateDepartment(department);
-        validateName(name);
-    }
-
     // Getters and Setters with validation
-    public T getEmployeeId() { return employeeId; }
     public String getName() { return name; }
     public String getDepartment() { return department; }
     public double getSalary() { return salary; }
@@ -107,19 +90,19 @@ public class Employee<T> implements Comparable<Employee<T>> {
     public void setName(String name) {
         validateName(name);
         this.name = name;
-        LOGGER.log(Level.INFO, "Updated name for employee {0}: {1}", new Object[]{employeeId, name});
+        LOGGER.log(Level.INFO, "Updated name for employee {0}: {1}", new Object[]{id, name});
     }
 
     public void setDepartment(String department) throws InvalidDepartmentException {
         validateDepartment(department);
         this.department = department;
-        LOGGER.log(Level.INFO, "Updated department for employee {0}: {1}", new Object[]{employeeId, department});
+        LOGGER.log(Level.INFO, "Updated department for employee {0}: {1}", new Object[]{id, department});
     }
 
     public void setSalary(double salary) throws InvalidSalaryException {
         validateSalary(salary);
         this.salary = Math.round(salary * 100.0) / 100.0;
-        LOGGER.log(Level.INFO, "Updated salary for employee {0}: {1}", new Object[]{employeeId, this.salary});
+        LOGGER.log(Level.INFO, "Updated salary for employee {0}: {1}", new Object[]{id, this.salary});
     }
 
     public void setPerformanceRating(double performanceRating) throws IllegalArgumentException {
@@ -128,7 +111,7 @@ public class Employee<T> implements Comparable<Employee<T>> {
             throw new IllegalArgumentException("Performance rating must be between 0 and 5");
         }
         this.performanceRating = Math.round(performanceRating * 10.0) / 10.0; // Round to 1 decimal place
-        LOGGER.log(Level.INFO, "Updated performance rating for employee {0}: {1}", new Object[]{employeeId, this.performanceRating});
+        LOGGER.log(Level.INFO, "Updated performance rating for employee {0}: {1}", new Object[]{id, this.performanceRating});
     }
 
     public void setYearsOfExperience(int yearsOfExperience) throws IllegalArgumentException {
@@ -137,20 +120,18 @@ public class Employee<T> implements Comparable<Employee<T>> {
             throw new IllegalArgumentException("Years of experience cannot be negative");
         }
         this.yearsOfExperience = yearsOfExperience;
-        LOGGER.log(Level.INFO, "Updated years of experience for employee {0}: {1}", new Object[]{employeeId, yearsOfExperience});
+        LOGGER.log(Level.INFO, "Updated years of experience for employee {0}: {1}", new Object[]{id, yearsOfExperience});
     }
 
     public void setActive(boolean active) {
         isActive = active;
-        LOGGER.log(Level.INFO, "Updated active status for employee {0}: {1}", new Object[]{employeeId, active});
+        LOGGER.log(Level.INFO, "Updated active status for employee {0}: {1}", new Object[]{id, active});
     }
 
     @Override
     public int compareTo(Employee<T> other) {
-        if (other == null) {
-            return 1; // This object is greater than null
-        }
-        return Integer.compare(other.yearsOfExperience, this.yearsOfExperience);
+        if (other == null) return 1;
+        return Integer.compare(this.yearsOfExperience, other.yearsOfExperience);
     }
 
     @Override
@@ -158,19 +139,19 @@ public class Employee<T> implements Comparable<Employee<T>> {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         Employee<?> employee = (Employee<?>) obj;
-        return employeeId.equals(employee.employeeId);
+        return id == employee.id;
     }
 
     @Override
     public int hashCode() {
-        return employeeId.hashCode();
+        return id;
     }
 
     @Override
     public String toString() {
-        return String.format("ID: %s | Name: %s | Department: %s | Salary: $%.2f | " +
+        return String.format("ID: %d | Name: %s | Department: %s | Salary: $%.2f | " +
                            "Rating: %.1f | Experience: %d years | Status: %s",
-                           employeeId, name, department, salary, performanceRating,
+                           id, name, department, salary, performanceRating,
                            yearsOfExperience, isActive ? "Active" : "Inactive");
     }
 } 

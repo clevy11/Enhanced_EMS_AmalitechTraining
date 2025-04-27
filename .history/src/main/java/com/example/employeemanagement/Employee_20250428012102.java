@@ -8,11 +8,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Employee<T> implements Comparable<Employee<T>> {
-    private static int nextId = 1; // Static counter for auto-incrementing IDs
     private static final Logger LOGGER = Logger.getLogger(Employee.class.getName());
     private static final Set<String> VALID_DEPARTMENTS = new HashSet<>(Arrays.asList(
         "HR", "IT", "Finance", "Marketing", "Operations", "Sales"
     ));
+    
+    private static int nextId = 1; // Static counter for auto-incrementing IDs
     
     private final T employeeId;
     private String name;
@@ -22,28 +23,13 @@ public class Employee<T> implements Comparable<Employee<T>> {
     private int yearsOfExperience;
     private boolean isActive;
 
-    public Employee(String name, String department, double salary) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
+    public Employee(String name, String department, double salary) {
+        this.employeeId = (T) Integer.valueOf(nextId++);
         this.name = name;
         this.department = department;
-        this.salary = salary;
+        this.salary = Math.round(salary * 100.0) / 100.0;
         this.performanceRating = 0.0;
         this.yearsOfExperience = 0;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
-    }
-
-    public Employee(String name, String department, double salary, double performanceRating, int yearsOfExperience) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-        this.performanceRating = performanceRating;
-        this.yearsOfExperience = yearsOfExperience;
-        validateEmployee();
         this.isActive = true;
         LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
     }
@@ -87,12 +73,6 @@ public class Employee<T> implements Comparable<Employee<T>> {
             LOGGER.log(Level.SEVERE, "Attempted to set name that is too short: {0}", name);
             throw new IllegalArgumentException("Name must be at least 2 characters long");
         }
-    }
-
-    private void validateEmployee() throws InvalidSalaryException, InvalidDepartmentException {
-        validateSalary(salary);
-        validateDepartment(department);
-        validateName(name);
     }
 
     // Getters and Setters with validation

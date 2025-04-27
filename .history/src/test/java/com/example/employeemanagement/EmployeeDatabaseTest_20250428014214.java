@@ -13,24 +13,21 @@ public class EmployeeDatabaseTest {
     @BeforeEach
     void setUp() throws InvalidSalaryException, InvalidDepartmentException {
         database = new EmployeeDatabase<>();
-        testEmployee = new Employee<>("John Doe", "IT", 50000.0);
+        testEmployee = new Employee<Integer>("John Doe", "IT", 50000.0, 4.5, 5);
         testEmployeeId = database.addEmployee(testEmployee);
     }
 
     @Test
     void testAddEmployee() throws InvalidSalaryException, InvalidDepartmentException, EmployeeNotFoundException {
-        Employee<Integer> newEmployee = new Employee<>("Jane Smith", "HR", 60000.0);
+        Employee<Integer> newEmployee = new Employee<Integer>("Jane Smith", "HR", 60000.0, 4.0, 3);
         Integer newEmployeeId = database.addEmployee(newEmployee);
-        Employee<Integer> retrievedEmployee = database.getEmployee(newEmployeeId);
-        assertEquals(newEmployee.getName(), retrievedEmployee.getName());
-        assertEquals(newEmployee.getDepartment(), retrievedEmployee.getDepartment());
-        assertEquals(newEmployee.getSalary(), retrievedEmployee.getSalary());
+        assertEquals(newEmployee, database.getEmployee(newEmployeeId));
     }
 
     @Test
     void testAddDuplicateEmployee() throws InvalidSalaryException, InvalidDepartmentException {
         assertThrows(IllegalArgumentException.class, () -> {
-            Employee<Integer> duplicate = new Employee<>("John Doe", "IT", 50000.0);
+            Employee<Integer> duplicate = new Employee<Integer>("John Doe", "IT", 50000.0, 4.5, 5);
             database.addEmployee(duplicate);
         });
     }
@@ -120,9 +117,7 @@ public class EmployeeDatabaseTest {
     }
 
     @Test
-    void testGiveSalaryRaise() throws InvalidSalaryException, EmployeeNotFoundException, InvalidDepartmentException {
-        // Set performance rating to 4.5 to qualify for the raise
-        database.updateEmployeeDetails(testEmployeeId, "performancerating", 4.5);
+    void testGiveSalaryRaise() throws InvalidSalaryException, EmployeeNotFoundException {
         database.giveSalaryRaise(10.0, 4.0);
         assertEquals(55000.0, database.getEmployee(testEmployeeId).getSalary());
     }

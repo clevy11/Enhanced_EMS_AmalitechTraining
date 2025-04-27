@@ -146,11 +146,9 @@
                 </columns>
                 <contextMenu>
                     <ContextMenu>
-                        <items>
-                            <MenuItem text="Update" onAction="#handleUpdateEmployee" />
-                            <MenuItem text="Remove" onAction="#handleRemoveEmployee" />
-                            <MenuItem text="Raise Salary" onAction="#handleRaiseSalary" />
-                        </items>
+                        <MenuItem text="Update" onAction="#handleUpdateEmployee" />
+                        <MenuItem text="Remove" onAction="#handleRemoveEmployee" />
+                        <MenuItem text="Raise Salary" onAction="#handleRaiseSalary" />
                     </ContextMenu>
                 </contextMenu>
             </TableView>

@@ -1,6 +1,7 @@
 package com.example.employeemanagement;
 
 import com.example.employeemanagement.Exception.*;
+import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.Arrays;
@@ -8,13 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Employee<T> implements Comparable<Employee<T>> {
-    private static int nextId = 1; // Static counter for auto-incrementing IDs
     private static final Logger LOGGER = Logger.getLogger(Employee.class.getName());
     private static final Set<String> VALID_DEPARTMENTS = new HashSet<>(Arrays.asList(
         "HR", "IT", "Finance", "Marketing", "Operations", "Sales"
     ));
     
-    private final T employeeId;
+    private final UUID employeeId;
     private String name;
     private String department;
     private double salary;
@@ -22,30 +22,14 @@ public class Employee<T> implements Comparable<Employee<T>> {
     private int yearsOfExperience;
     private boolean isActive;
 
-    public Employee(String name, String department, double salary) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
+    public Employee(String name, String department, double salary) {
+        this.employeeId = UUID.randomUUID();
+        setName(name);
+        setDepartment(department);
+        setSalary(salary);
         this.performanceRating = 0.0;
         this.yearsOfExperience = 0;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
-    }
-
-    public Employee(String name, String department, double salary, double performanceRating, int yearsOfExperience) 
-            throws InvalidSalaryException, InvalidDepartmentException {
-        this.employeeId = (T) Integer.valueOf(nextId++); // Auto-increment and cast to generic type
-        this.name = name;
-        this.department = department;
-        this.salary = salary;
-        this.performanceRating = performanceRating;
-        this.yearsOfExperience = yearsOfExperience;
-        validateEmployee();
-        this.isActive = true;
-        LOGGER.log(Level.INFO, "Created new employee with auto-generated ID: {0}", this.employeeId);
+        LOGGER.log(Level.INFO, "Created new employee with ID: {0}", employeeId);
     }
 
     private void validateSalary(double salary) throws InvalidSalaryException {
@@ -89,14 +73,10 @@ public class Employee<T> implements Comparable<Employee<T>> {
         }
     }
 
-    private void validateEmployee() throws InvalidSalaryException, InvalidDepartmentException {
-        validateSalary(salary);
-        validateDepartment(department);
-        validateName(name);
-    }
-
     // Getters and Setters with validation
-    public T getEmployeeId() { return employeeId; }
+    public UUID getEmployeeId() {
+        return employeeId;
+    }
     public String getName() { return name; }
     public String getDepartment() { return department; }
     public double getSalary() { return salary; }

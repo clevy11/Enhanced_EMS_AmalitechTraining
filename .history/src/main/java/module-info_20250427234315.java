@@ -1,5 +1,4 @@
 module com.example.employeemanagement {
-    requires javafx.base;
     requires javafx.controls;
     requires javafx.fxml;
 

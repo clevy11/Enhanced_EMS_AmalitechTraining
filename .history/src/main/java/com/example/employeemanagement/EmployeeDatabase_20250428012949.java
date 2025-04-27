@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-public class EmployeeDatabase<T> {
+public class EmployeeDatabase {
     private static final Logger LOGGER = Logger.getLogger(EmployeeDatabase.class.getName());
-    private final Map<T, Employee<T>> employees;
-    private final List<Employee<T>> employeeList;
+    private final Map<Integer, Employee> employees;
+    private final List<Employee> employeeList;
 
     public EmployeeDatabase() {
         this.employees = new HashMap<>();
@@ -18,7 +18,7 @@ public class EmployeeDatabase<T> {
     }
 
     // CRUD Operations
-    public T addEmployee(Employee<T> employee) {
+    public void addEmployee(Employee employee) {
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Attempted to add null employee");
             throw new IllegalArgumentException("Employee cannot be null");
@@ -30,15 +30,14 @@ public class EmployeeDatabase<T> {
         employees.put(employee.getEmployeeId(), employee);
         employeeList.add(employee);
         LOGGER.log(Level.INFO, "Added new employee with ID: {0}", employee.getEmployeeId());
-        return employee.getEmployeeId();
     }
 
-    public Employee<T> getEmployee(T employeeId) throws EmployeeNotFoundException {
+    public Employee getEmployee(Integer employeeId) throws EmployeeNotFoundException {
         if (employeeId == null) {
             LOGGER.log(Level.SEVERE, "Null employee ID provided");
             throw new IllegalArgumentException("Employee ID cannot be null");
         }
-        Employee<T> employee = employees.get(employeeId);
+        Employee employee = employees.get(employeeId);
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Employee with ID {0} not found", employeeId);
             throw new EmployeeNotFoundException("Employee with ID " + employeeId + " not found");
@@ -47,12 +46,12 @@ public class EmployeeDatabase<T> {
         return employee;
     }
 
-    public void removeEmployee(T employeeId) throws EmployeeNotFoundException {
+    public void removeEmployee(Integer employeeId) throws EmployeeNotFoundException {
         if (employeeId == null) {
             LOGGER.log(Level.SEVERE, "Null employee ID provided");
             throw new IllegalArgumentException("Employee ID cannot be null");
         }
-        Employee<T> employee = employees.remove(employeeId);
+        Employee employee = employees.remove(employeeId);
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Attempted to remove non-existent employee with ID: {0}", employeeId);
             throw new EmployeeNotFoundException("Employee with ID " + employeeId + " not found");
@@ -61,14 +60,14 @@ public class EmployeeDatabase<T> {
         LOGGER.log(Level.INFO, "Removed employee with ID: {0}", employeeId);
     }
 
-    public void updateEmployeeDetails(T employeeId, String field, Object value) 
+    public void updateEmployeeDetails(Integer employeeId, String field, Object value) 
             throws EmployeeNotFoundException, InvalidSalaryException, InvalidDepartmentException {
         if (employeeId == null) {
             LOGGER.log(Level.SEVERE, "Null employee ID provided");
             throw new IllegalArgumentException("Employee ID cannot be null");
         }
         
-        Employee<T> employee = getEmployee(employeeId);
+        Employee employee = getEmployee(employeeId);
         if (employee == null) {
             LOGGER.log(Level.SEVERE, "Employee not found: {0}", employeeId);
             throw new EmployeeNotFoundException("Employee not found");
@@ -125,13 +124,13 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> getAllEmployees() {
+    public List<Employee> getAllEmployees() {
         LOGGER.log(Level.INFO, "Retrieved all employees. Count: {0}", employeeList.size());
         return new ArrayList<>(employeeList);
     }
 
     // Search and Filter Operations
-    public List<Employee<T>> getEmployeesByDepartment(String department) throws InvalidDepartmentException {
+    public List<Employee> getEmployeesByDepartment(String department) throws InvalidDepartmentException {
         if (department == null || department.trim().isEmpty()) {
             LOGGER.log(Level.SEVERE, "Null or empty department provided");
             throw new InvalidDepartmentException("Department cannot be null or empty");
@@ -143,7 +142,7 @@ public class EmployeeDatabase<T> {
         }
         
         try {
-            List<Employee<T>> result = employeeList.stream()
+            List<Employee> result = employeeList.stream()
                     .filter(Objects::nonNull)
                     .filter(e -> {
                         String dept = e.getDepartment();
@@ -160,7 +159,7 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> searchEmployeesByName(String searchTerm) {
+    public List<Employee> searchEmployeesByName(String searchTerm) {
         if (searchTerm == null || searchTerm.trim().isEmpty()) {
             LOGGER.log(Level.SEVERE, "Empty search term provided");
             throw new IllegalArgumentException("Search term cannot be null or empty");
@@ -172,7 +171,7 @@ public class EmployeeDatabase<T> {
         }
         
         try {
-            List<Employee<T>> result = employeeList.stream()
+            List<Employee> result = employeeList.stream()
                     .filter(Objects::nonNull)
                     .filter(e -> {
                         String name = e.getName();
@@ -189,12 +188,12 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> getHighPerformingEmployees(double minRating) {
+    public List<Employee> getHighPerformingEmployees(double minRating) {
         if (minRating < 0 || minRating > 5) {
             LOGGER.log(Level.SEVERE, "Invalid minimum rating: {0}", minRating);
             throw new IllegalArgumentException("Rating must be between 0 and 5");
         }
-        List<Employee<T>> result = employeeList.stream()
+        List<Employee> result = employeeList.stream()
                 .filter(e -> e.getPerformanceRating() >= minRating)
                 .collect(Collectors.toList());
         LOGGER.log(Level.INFO, "Found {0} high-performing employees (rating >= {1})", 
@@ -202,7 +201,7 @@ public class EmployeeDatabase<T> {
         return result;
     }
 
-    public List<Employee<T>> getEmployeesInSalaryRange(double minSalary, double maxSalary) 
+    public List<Employee> getEmployeesInSalaryRange(double minSalary, double maxSalary) 
             throws InvalidSalaryException {
         if (minSalary < 0 || maxSalary < 0) {
             LOGGER.log(Level.SEVERE, "Negative salary range provided: min={0}, max={1}", 
@@ -222,14 +221,14 @@ public class EmployeeDatabase<T> {
     }
 
     // Sorting Operations
-    public List<Employee<T>> sortByExperience() {
+    public List<Employee> sortByExperience() {
         if (employeeList.isEmpty()) {
             LOGGER.log(Level.INFO, "Attempted to sort empty employee list by experience");
             return new ArrayList<>();
         }
         
         try {
-            List<Employee<T>> result = employeeList.stream()
+            List<Employee> result = employeeList.stream()
                     .filter(Objects::nonNull)
                     .sorted(Comparator.nullsLast(Comparator.naturalOrder()))
                     .collect(Collectors.toList());
@@ -241,14 +240,14 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> sortBySalary() {
+    public List<Employee> sortBySalary() {
         if (employeeList.isEmpty()) {
             LOGGER.log(Level.INFO, "Attempted to sort empty employee list by salary");
             return new ArrayList<>();
         }
         
         try {
-            List<Employee<T>> result = employeeList.stream()
+            List<Employee> result = employeeList.stream()
                     .filter(Objects::nonNull)
                     .sorted(Comparator.nullsLast(
                         Comparator.comparing(
@@ -265,14 +264,14 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> sortByPerformance() {
+    public List<Employee> sortByPerformance() {
         if (employeeList.isEmpty()) {
             LOGGER.log(Level.INFO, "Attempted to sort empty employee list by performance");
             return new ArrayList<>();
         }
         
         try {
-            List<Employee<T>> result = employeeList.stream()
+            List<Employee> result = employeeList.stream()
                     .filter(Objects::nonNull)
                     .sorted(Comparator.nullsLast(
                         Comparator.comparing(
@@ -317,12 +316,12 @@ public class EmployeeDatabase<T> {
             new Object[]{percentage, minRating});
     }
 
-    public List<Employee<T>> getTopPaidEmployees(int count) {
+    public List<Employee> getTopPaidEmployees(int count) {
         if (count <= 0) {
             LOGGER.log(Level.SEVERE, "Invalid count for top paid employees: {0}", count);
             throw new IllegalArgumentException("Count must be positive");
         }
-        List<Employee<T>> result = employeeList.stream()
+        List<Employee> result = employeeList.stream()
                 .sorted((e1, e2) -> Double.compare(e2.getSalary(), e1.getSalary()))
                 .limit(count)
                 .collect(Collectors.toList());
@@ -336,7 +335,7 @@ public class EmployeeDatabase<T> {
             throw new InvalidDepartmentException("Department cannot be null or empty");
         }
         
-        List<Employee<T>> deptEmployees = getEmployeesByDepartment(department);
+        List<Employee> deptEmployees = getEmployeesByDepartment(department);
         if (deptEmployees.isEmpty()) {
             LOGGER.log(Level.INFO, "No employees found in department: {0}", department);
             return 0.0;

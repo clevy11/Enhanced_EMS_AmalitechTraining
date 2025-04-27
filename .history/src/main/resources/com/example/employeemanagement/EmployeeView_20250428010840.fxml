@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Text?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.employeemanagement.EmployeeController"
+      spacing="10"
+      padding="10">
+
+    <Text text="Employee Management System" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Name:"/>
+        <TextField fx:id="nameField" promptText="Enter name"/>
+        
+        <Label text="Department:"/>
+        <TextField fx:id="departmentField" promptText="Enter department"/>
+        
+        <Label text="Salary:"/>
+        <TextField fx:id="salaryField" promptText="Enter salary"/>
+        
+        <Button text="Save" onAction="#handleSave" fx:id="saveButton"/>
+    </HBox>
+
+    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn fx:id="idColumn" text="ID" prefWidth="200"/>
+            <TableColumn fx:id="nameColumn" text="Name" prefWidth="150"/>
+            <TableColumn fx:id="departmentColumn" text="Department" prefWidth="150"/>
+            <TableColumn fx:id="salaryColumn" text="Salary" prefWidth="100"/>
+            <TableColumn fx:id="performanceColumn" text="Performance" prefWidth="100"/>
+            <TableColumn fx:id="experienceColumn" text="Experience" prefWidth="100"/>
+        </columns>
+    </TableView>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT" fx:id="actionButtons" visible="false">
+        <Button text="Update" onAction="#handleUpdate" fx:id="updateButton"/>
+        <Button text="Delete" onAction="#handleDelete" fx:id="deleteButton"/>
+        <Button text="Give Raise" onAction="#handleRaise" fx:id="raiseButton"/>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_RIGHT">
+        <Button text="Sort by Experience" onAction="#handleSortByExperience"/>
+        <Button text="Sort by Salary" onAction="#handleSortBySalary"/>
+        <Button text="Sort by Performance" onAction="#handleSortByPerformance"/>
+    </HBox>
+
+    <HBox spacing="10" alignment="CENTER_LEFT">
+        <Label text="Search:"/>
+        <TextField fx:id="searchField" promptText="Search by name"/>
+        <Button text="Search" onAction="#handleSearch"/>
+    </HBox>
+
+</VBox> 

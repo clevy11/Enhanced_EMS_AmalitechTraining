@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.example.employeemanagement.MainController"
+      spacing="10"
+      padding="10">
+
+    <Label text="Employee Management System" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    
+    <HBox spacing="10">
+        <Button text="Add Employee" onAction="#handleAddEmployee"/>
+        <Button text="View Employees" onAction="#handleViewEmployees"/>
+        <Button text="Search Employees" onAction="#handleSearchEmployees"/>
+    </HBox>
+
+    <TableView fx:id="employeeTable" VBox.vgrow="ALWAYS">
+        <columns>
+            <TableColumn text="ID" fx:id="idColumn"/>
+            <TableColumn text="Name" fx:id="nameColumn"/>
+            <TableColumn text="Department" fx:id="departmentColumn"/>
+            <TableColumn text="Salary" fx:id="salaryColumn"/>
+        </columns>
+    </TableView>
+
+</VBox> 
