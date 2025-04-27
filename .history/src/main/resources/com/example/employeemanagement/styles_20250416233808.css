@@ -1,0 +1,188 @@
+/* Global Styles */
+.root {
+    -fx-font-family: 'Segoe UI', Arial, sans-serif;
+    -fx-background-color: #f0f2f5;
+}
+
+/* Main Container */
+.main-container {
+    -fx-background-color: #f0f2f5;
+    -fx-padding: 0;
+}
+
+/* Header Styles */
+.header {
+    -fx-background-color: #2196F3;
+    -fx-padding: 15px;
+    -fx-alignment: center-left;
+}
+
+.header-text {
+    -fx-text-fill: white;
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+}
+
+/* Form Container */
+.form-container {
+    -fx-background-color: white;
+    -fx-padding: 20px;
+    -fx-spacing: 15px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+    -fx-background-radius: 10px;
+    -fx-margin: 10px;
+}
+
+.form-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.form-grid {
+    -fx-padding: 10px;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #333;
+    -fx-font-weight: bold;
+}
+
+/* Text Fields */
+.text-field {
+    -fx-background-color: #f8f9fa;
+    -fx-background-radius: 5px;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 5px;
+    -fx-padding: 8px;
+    -fx-font-size: 14px;
+}
+
+.text-field:focused {
+    -fx-border-color: #2196F3;
+    -fx-effect: dropshadow(gaussian, rgba(33,150,243,0.2), 5, 0, 0, 2);
+}
+
+/* Error Labels */
+.error-label {
+    -fx-text-fill: #dc3545;
+    -fx-font-size: 12px;
+}
+
+/* Buttons */
+.action-button {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-padding: 10px 20px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+}
+
+.action-button:hover {
+    -fx-background-color: #1976D2;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-radius: 5px;
+    -fx-padding: 5px 15px;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: rgba(255,255,255,0.1);
+}
+
+/* Search Section */
+.search-container {
+    -fx-spacing: 15px;
+    -fx-padding: 20px;
+}
+
+.search-box {
+    -fx-spacing: 10px;
+    -fx-alignment: center-left;
+}
+
+.search-field {
+    -fx-pref-width: 200px;
+    -fx-background-radius: 20px;
+}
+
+.search-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 20px;
+}
+
+.search-button:hover {
+    -fx-background-color: #388E3C;
+}
+
+/* Sort Buttons */
+.sort-buttons {
+    -fx-spacing: 10px;
+}
+
+.sort-button {
+    -fx-background-color: #FF9800;
+    -fx-text-fill: white;
+    -fx-background-radius: 5px;
+    -fx-padding: 8px 15px;
+}
+
+.sort-button:hover {
+    -fx-background-color: #F57C00;
+}
+
+/* Table Styles */
+.data-table {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+
+.table-column {
+    -fx-alignment: center-left;
+    -fx-padding: 10px;
+}
+
+.table-view .column-header {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10px;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: white;
+    -fx-padding: 5px;
+}
+
+.table-view .table-row-cell:odd {
+    -fx-background-color: #f8f9fa;
+}
+
+.table-view .table-row-cell:selected {
+    -fx-background-color: #E3F2FD;
+}
+
+/* Alert Dialog Styles */
+.dialog-pane {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+}
+
+.dialog-pane .button {
+    -fx-background-color: #2196F3;
+    -fx-text-fill: white;
+}
+
+.dialog-pane .button:hover {
+    -fx-background-color: #1976D2;
+} 

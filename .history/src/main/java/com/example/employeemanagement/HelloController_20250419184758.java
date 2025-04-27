@@ -10,15 +10,15 @@ import java.io.IOException;
 
 public class HelloController {
     @FXML
-    private void goToEmployeeManagement(javafx.event.ActionEvent event) {
+    private void goToEmployeeManagement() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("employee-view.fxml"));
             Parent root = loader.load();
             Scene scene = new Scene(root);
             scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
             
-            // Get current stage from the event source
-            Stage stage = (Stage) ((javafx.scene.Node)event.getSource()).getScene().getWindow();
+            // Get current stage and set new scene
+            Stage stage = (Stage) ((Button) (javafx.event.ActionEvent.ANY_SOURCE.getTarget())).getScene().getWindow();
             stage.setScene(scene);
             stage.setFullScreen(true);
         } catch (IOException e) {

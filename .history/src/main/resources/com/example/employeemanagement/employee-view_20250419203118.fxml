@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="486.0" prefWidth="1242.0" styleClass="main-container" VBox.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.employeemanagement.EmployeeController">
+    
+    <!-- Header Section -->
+    <HBox styleClass="header" VBox.vgrow="NEVER">
+        <Label styleClass="header-text" text="Employee Management System">
+            <font>
+                <Font name="System Bold" size="24.0" />
+            </font>
+        </Label>
+        <Region HBox.hgrow="ALWAYS" />
+    </HBox>
+
+    <!-- Main Content -->
+    <HBox styleClass="content-container" VBox.vgrow="ALWAYS">
+        <!-- Form Section -->
+        <VBox styleClass="form-container" HBox.hgrow="ALWAYS">
+            <Label styleClass="form-title" text="Employee Details">
+                <padding>
+                    <Insets left="23.0" />
+                </padding>
+                <VBox.margin>
+                    <Insets top="18.0" />
+                </VBox.margin>
+            </Label>
+            
+            <GridPane hgap="18.0" prefHeight="229.0" prefWidth="553.0" styleClass="form-grid" vgap="12.0">
+                <!-- Row 1 -->
+                <Label text="Employee ID:" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <TextField fx:id="employeeIdField" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                <Label fx:id="idErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                
+                <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <TextField fx:id="nameField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                <Label fx:id="nameErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                
+                <Label text="Department:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                <TextField fx:id="departmentField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                <Label fx:id="departmentErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+                
+                <!-- Row 2 -->
+                <Label text="Salary:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                <TextField fx:id="salaryField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+                <Label fx:id="salaryErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                
+                <Label text="Performance Rating:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                <TextField fx:id="ratingField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+                <Label fx:id="ratingErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+                
+                <Label text="Years of Experience:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                <TextField fx:id="experienceField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+                <Label fx:id="experienceErrorLabel" prefHeight="20.0" prefWidth="200.0" styleClass="error-label" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                
+                <columnConstraints>
+                    <ColumnConstraints />
+                    <ColumnConstraints maxWidth="250.0" minWidth="149.33333333333331" prefWidth="200.0" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                    <RowConstraints />
+                    <RowConstraints maxHeight="20.0" minHeight="10.0" prefHeight="15.0" />
+                </rowConstraints>
+                <padding>
+                    <Insets left="30.0" top="2.0" />
+                </padding>
+            </GridPane>
+
+            <!-- Action Buttons -->
+            <HBox styleClass="button-container">
+                <Button onAction="#handleAddEmployee" styleClass="action-button" text="Add ">
+               <HBox.margin>
+                  <Insets top="20.0" />
+               </HBox.margin></Button>
+                <Button onAction="#handleUpdateEmployee" prefHeight="25.0" prefWidth="101.0" styleClass="action-button" text="Update ">
+               <HBox.margin>
+                  <Insets left="45.0" top="20.0" />
+               </HBox.margin></Button>
+                <Button layoutX="-12.0" onAction="#handleRemoveEmployee" styleClass="action-button" text="Remove">
+               <HBox.margin>
+                  <Insets left="49.0" top="20.0" />
+               </HBox.margin></Button>
+                <HBox.margin>
+                    <Insets left="7.0" right="3.0" top="30.0" />
+                </HBox.margin>
+                <padding>
+                    <Insets left="17.0" right="8.0" />
+                </padding>
+            </HBox>
+        </VBox>
+
+        <!-- Search and Table Section -->
+        <VBox styleClass="search-container" HBox.hgrow="ALWAYS">
+            <HBox styleClass="search-box">
+                <TextField fx:id="searchField" promptText="Search by name..." styleClass="search-field" />
+                <TextField fx:id="departmentFilterField" promptText="Filter by department..." styleClass="search-field" />
+                <Button onAction="#handleSearch" styleClass="search-button" text="Search" />
+            </HBox>
+
+            <HBox styleClass="sort-buttons">
+                <Button onAction="#handleSortByExperience" styleClass="sort-button" text="Sort by Experience" />
+                <Button onAction="#handleSortBySalary" styleClass="sort-button" text="Sort by Salary" />
+                <Button onAction="#handleSortByPerformance" styleClass="sort-button" text="Sort by Performance" />
+            </HBox>
+
+            <TableView fx:id="employeeTable" prefHeight="400.0" prefWidth="565.0" styleClass="data-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" prefWidth="73.99999749660492" styleClass="table-column" text="ID" />
+                    <TableColumn fx:id="nameColumn" prefWidth="117.33332061767578" styleClass="table-column" text="Name" />
+                    <TableColumn fx:id="departmentColumn" prefWidth="138.66676330566406" styleClass="table-column" text="Department" />
+                    <TableColumn fx:id="salaryColumn" minWidth="7.3333740234375" prefWidth="73.99993896484375" styleClass="table-column" text="Salary" />
+                    <TableColumn fx:id="ratingColumn" prefWidth="132.66665649414062" styleClass="table-column" text="Rating" />
+                    <TableColumn fx:id="experienceColumn" prefWidth="134.6666259765625" styleClass="table-column" text="Experience" />
+                </columns>
+            </TableView>
+        </VBox>
+    </HBox>
+</VBox>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns:fx="http://javafx.com/fxml" fx:controller="com.example.employeemanagement.EmployeeController" 
+      styleClass="main-container" VBox.vgrow="ALWAYS">
+    
+    <!-- Header Section -->
+    <HBox styleClass="header" VBox.vgrow="NEVER">
+        <Label text="Employee Management System" styleClass="header-text"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button text="Home" onAction="#goToHome" styleClass="nav-button"/>
+    </HBox>
+
+    <!-- Main Content -->
+    <HBox styleClass="content-container" VBox.vgrow="ALWAYS">
+        <!-- Form Section -->
+        <VBox styleClass="form-container" HBox.hgrow="ALWAYS">
+            <Label text="Employee Details" styleClass="form-title"/>
+            
+            <GridPane styleClass="form-grid" vgap="10" hgap="10">
+                <!-- Row 1 -->
+                <Label text="Employee ID:" GridPane.rowIndex="0" GridPane.columnIndex="0"/>
+                <TextField fx:id="employeeIdField" GridPane.rowIndex="0" GridPane.columnIndex="1"/>
+                <Label fx:id="idErrorLabel" styleClass="error-label" GridPane.rowIndex="0" GridPane.columnIndex="2"/>
+                
+                <Label text="Name:" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+                <TextField fx:id="nameField" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+                <Label fx:id="nameErrorLabel" styleClass="error-label" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+                
+                <Label text="Department:" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+                <TextField fx:id="departmentField" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+                <Label fx:id="departmentErrorLabel" styleClass="error-label" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+                
+                <!-- Row 2 -->
+                <Label text="Salary:" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+                <TextField fx:id="salaryField" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+                <Label fx:id="salaryErrorLabel" styleClass="error-label" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+                
+                <Label text="Performance Rating:" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+                <TextField fx:id="ratingField" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+                <Label fx:id="ratingErrorLabel" styleClass="error-label" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+                
+                <Label text="Years of Experience:" GridPane.rowIndex="5" GridPane.columnIndex="0"/>
+                <TextField fx:id="experienceField" GridPane.rowIndex="5" GridPane.columnIndex="1"/>
+                <Label fx:id="experienceErrorLabel" styleClass="error-label" GridPane.rowIndex="5" GridPane.columnIndex="2"/>
+            </GridPane>
+
+            <!-- Action Buttons -->
+            <HBox styleClass="button-container">
+                <Button text="Add Employee" onAction="#handleAddEmployee" styleClass="action-button"/>
+                <Button text="Update Employee" onAction="#handleUpdateEmployee" styleClass="action-button"/>
+                <Button text="Remove Employee" onAction="#handleRemoveEmployee" styleClass="action-button"/>
+            </HBox>
+        </VBox>
+
+        <!-- Search and Table Section -->
+        <VBox styleClass="search-container" HBox.hgrow="ALWAYS">
+            <HBox styleClass="search-box">
+                <TextField fx:id="searchField" promptText="Search by name..." styleClass="search-field"/>
+                <TextField fx:id="departmentFilterField" promptText="Filter by department..." styleClass="search-field"/>
+                <Button text="Search" onAction="#handleSearch" styleClass="search-button"/>
+            </HBox>
+
+            <HBox styleClass="sort-buttons">
+                <Button text="Sort by Experience" onAction="#handleSortByExperience" styleClass="sort-button"/>
+                <Button text="Sort by Salary" onAction="#handleSortBySalary" styleClass="sort-button"/>
+                <Button text="Sort by Performance" onAction="#handleSortByPerformance" styleClass="sort-button"/>
+            </HBox>
+
+            <TableView fx:id="employeeTable" styleClass="data-table" VBox.vgrow="ALWAYS">
+                <columns>
+                    <TableColumn fx:id="idColumn" text="ID" styleClass="table-column"/>
+                    <TableColumn fx:id="nameColumn" text="Name" styleClass="table-column"/>
+                    <TableColumn fx:id="departmentColumn" text="Department" styleClass="table-column"/>
+                    <TableColumn fx:id="salaryColumn" text="Salary" styleClass="table-column"/>
+                    <TableColumn fx:id="ratingColumn" text="Rating" styleClass="table-column"/>
+                    <TableColumn fx:id="experienceColumn" text="Experience" styleClass="table-column"/>
+                </columns>
+            </TableView>
+        </VBox>
+    </HBox>
+</VBox> 
